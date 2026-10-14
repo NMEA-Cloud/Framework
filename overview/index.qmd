@@ -1,0 +1,78 @@
+# Overview {#sec-overview}
+
+[Informative]{.status}
+
+## The problem
+
+Mariners have no common way to share what they see — or what shore services know — in real time.
+
+Existing maritime communication standards each solve part of the problem:
+
+- **AIS, VDES and "Smart Shipping" initiatives** exchange a defined set of vessel and navigational messages between ships and shore.
+  They were not designed to carry arbitrary, fast-changing observations such as the presence of whales, floating debris or changing waterway conditions.
+- **On-board networks — NMEA 0183 and NMEA 2000 —** carry instrument and navigation data *within* a vessel.
+  They have no notion of information that originates elsewhere, of who said it, or of whether it can be trusted.
+- **Proprietary Cloud Connections -** carry information between a vessel and a single manufacturer's cloud, siloing the information withing a single ecosystem.
+- **Mobile Applications -** provide solutions for a single user on a secondary device rather than in the primary environment being used to control the vessel, the helm.
+
+The result is that timely, actionable information — a whale sighting a few miles ahead, a hazard reported by another vessel —
+either never reaches the helm or arrives through channels that on-board systems cannot use.
+
+The same gap affects **recording**.
+Initiatives such as small-vessel voyage data recording need vessel data to be captured with consistent meaning and verifiable integrity,
+which on-board networks alone do not provide.
+
+## What the framework is
+
+The NMEA Cloud Framework is a **mesh of communication among vessels and shore services**,
+built on one common understanding of what the information means.
+
+- Ship-to-ship communication is assumed to be **intermittent and expensive**.
+  Each vessel therefore may have a **shadow** ashore that represents it while it is out of reach (see @sec-architecture).
+- Information is described by a **common semantic model** (@sec-semantic-model)
+  and kept consistent whichever transport carries it.
+- Information carries its own **authenticity**: it can be signed, so its origin can be verified independently of how it traveled (@sec-trust-security).
+- Each **binding** — JSON-LD, AIS, sentences, PGNs — maps the semantic model onto one representation and the transports that carry it (Part III).
+
+## What the framework is not
+
+- **Not a "One True Way".**
+  It does not replace existing cloud services, standards or manufacturer platforms; it gives them a common language to interoperate.
+- **Not a data repository or message broker operated by NMEA.**
+  There is no central system. Participants publish, route and consume information themselves.
+- **Not a point-in-time standard.**
+  It is a living document that evolves with implementation experience and ongoing technological development (see [Status](../index.qmd#status)).
+
+## Scope
+
+In scope:
+
+- the semantic model and the rules that keep information consistent across transports;
+- the trust model: identity, authenticity, authorization and provenance of information;
+- vocabularies for the initial application domains;
+- bindings for JSON-LD, AIS, sentences (NMEA 0183, IEC 61162-450) and PGNs (NMEA 2000, OneNet).
+
+Out of scope:
+
+- Information portrayal and user interfaces
+- Bindings for proprietary protocols
+- Commercial terms of service
+
+## Audience
+
+- **Authoritative Data Providers** providing original, authoritative official or commercially sourced data.
+- **Data aggregators** providing value-added services from other sources, including crowd-sourced networks.
+- **Application developers** building on-board or shore-side clients.
+- **Marine electronics manufacturers** building devices and gateways that produce or consume framework information.
+- **Researchers and program operators** who use the recorded and shared data.
+
+## Relationship to other standards
+
+::: {.callout-warning title="To be written"}
+Relationship with
+
+- On-vessel network standards such as NMEA 0183, 2000 and OneNet
+- AIS [@itu-m1371] and AIS application-specific messages [@imo-sn1-circ289]
+- IHO S-100
+- IETF RFCs and other web standards
+:::

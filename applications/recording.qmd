@@ -1,0 +1,17 @@
+# Vessel data recording {#sec-app-recording}
+
+[Informative]{.status}
+
+Recording vessel data — in the spirit of the **small-vessel voyage data recorder** program —
+needs what real-time sharing needs, applied over time:
+
+- data with a **consistent meaning**, independent of the on-board network it came from (@sec-vocab-vessel-data);
+- **integrity**, so that a recording can be shown not to have been altered (@sec-trust-security);
+- tolerance of **intermittent connectivity**, recording on board and synchronizing ashore via the vessel's shadow when a link is available.
+
+## Walkthrough
+
+::: {.callout-warning title="To be written"}
+Describe the small-vessel VDR program and its needs, with references.
+Trace vessel data from NMEA 2000 through a gateway into a signed record, and its synchronization ashore.
+:::

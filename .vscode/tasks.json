@@ -1,0 +1,30 @@
+{
+  // Live preview that watches every input file, including changes made outside the editor
+  // (git, scripts, AI agents). The Quarto extension's own preview only re-renders on save.
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Quarto: preview (watch all)",
+      "type": "shell",
+      "command": "quarto preview",
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "quarto",
+        "pattern": {
+          "regexp": "^(WARN|ERROR):\\s*(.*)$",
+          "severity": 1,
+          "message": 2
+        },
+        "background": {
+          "activesBegins": true,
+          "beginsPattern": "Preparing to preview",
+          "endsPattern": "Watching files for changes"
+        }
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      }
+    }
+  ]
+}

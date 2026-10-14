@@ -1,0 +1,126 @@
+# Observations {#sec-vocab-observations}
+
+[Normative]{.status}
+
+Terms for things that are **observed and reported** — by mariners, by shore services, or by automated systems —
+and that matter to others nearby in real time.
+
+## Biological observations
+
+Sightings of whales and other marine life were the framework's proof of concept (@sec-app-whales).
+Biological observations should reuse Darwin Core [@darwin-core], the established vocabulary for biodiversity records,
+so that sightings can flow to and from the scientific community without loss.
+
+### Occurrences and events
+
+Occurrence
+: Organisms of one kind, in one state, present at a place and time — for example "two orca calves".
+
+Event
+: Something that happened at a place during a period of time — for example "a sighting of an orca pod".
+  An event may contain occurrences, each referring to the event by its identifier.
+
+In Darwin Core, an occurrence is itself a kind of event.
+
+::: {.requirement #ncf-voc-obs-001}
+**NCF-VOC-OBS-001** · *Draft*\
+A participant that consumes biological observations MUST accept both a single `dwc:Occurrence` and a `dwc:Event` containing one or more `dwc:Occurrence` records.
+:::
+
+See [provisional decision 0011](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0011-sightings-as-events-and-occurrences.md).
+
+### Terms
+
+| Darwin Core term | Use |
+|---|---|
+| [`dwc:Event`](http://rs.tdwg.org/dwc/terms/Event) | A sighting as a whole, at a place during a period of time |
+| [`dwc:eventID`](http://rs.tdwg.org/dwc/terms/eventID) | Identifies an event |
+| [`dwc:Occurrence`](http://rs.tdwg.org/dwc/terms/Occurrence) | Organisms of one kind and state at a place and time — for example five adult females |
+| [`dwc:scientificName`](http://rs.tdwg.org/dwc/terms/scientificName) | What was seen |
+| [`dwc:individualCount`](http://rs.tdwg.org/dwc/terms/individualCount) | How many, in this occurrence |
+| [`dwc:sex`](http://rs.tdwg.org/dwc/terms/sex) | The sex of the organisms counted — for example female |
+| [`dwc:lifeStage`](http://rs.tdwg.org/dwc/terms/lifeStage) | Their life stage — for example adult or juvenile |
+| [`dwc:eventDate`](http://rs.tdwg.org/dwc/terms/eventDate) | When |
+| [`dwc:decimalLatitude`](http://rs.tdwg.org/dwc/terms/decimalLatitude), [`dwc:decimalLongitude`](http://rs.tdwg.org/dwc/terms/decimalLongitude) | Where |
+| [`dwc:basisOfRecord`](http://rs.tdwg.org/dwc/terms/basisOfRecord) | How it was observed — for example by a human or a machine |
+| [`dwc:Organism`](http://rs.tdwg.org/dwc/terms/Organism) | A particular organism, or a group recorded as one — for example a pod of orca |
+| [`dwc:organismID`](http://rs.tdwg.org/dwc/terms/organismID) | Identifies an organism or group |
+| [`dwc:ResourceRelationship`](http://rs.tdwg.org/dwc/terms/ResourceRelationship) | A relationship between two records — for example between a calf and its mother |
+| [`dwc:resourceID`](http://rs.tdwg.org/dwc/terms/resourceID) | The record the relationship is from (its subject) |
+| [`dwc:relatedResourceID`](http://rs.tdwg.org/dwc/terms/relatedResourceID) | The record the relationship is to (its object) |
+| [`dwc:relationshipOfResource`](http://rs.tdwg.org/dwc/terms/relationshipOfResource) | The type of relationship — for example *mother of* or *offspring of* |
+
+: Darwin Core terms likely to be used {#tbl-dwc-terms}
+
+::: {.callout-note title="Position"}
+Darwin Core gives a position as `dwc:decimalLatitude` and `dwc:decimalLongitude`.
+Alternatives are the common representation of position in the semantic model (@sec-semantic-model), for which candidates include GeoJSON [@rfc7946] and JSON-FG [@ogc-json-fg].
+:::
+
+### Groups of organisms
+
+A `dwc:Organism` is a single organism or a group of organisms recorded as one — for example a pod of orca (*Orcinus orca*).
+
+### Relationships between records
+
+`dwc:ResourceRelationship` corresponds to a relationship in the semantic model (@sec-semantic-model):
+
+| Semantic model | Darwin Core |
+|---|---|
+| from | `dwc:resourceID` |
+| to | `dwc:relatedResourceID` |
+| type | `dwc:relationshipOfResource` |
+
+: Darwin Core relationships and the semantic model {#tbl-dwc-relationships}
+
+For example, an individually identified calf — *offspring of* — an individually identified adult female.
+
+### Example
+
+A sighting of an orca pod of five adult females with two calves: one event containing two occurrences.
+
+| Property | Event | Occurrence 1 | Occurrence 2 |
+|---|---|---|---|
+| Identifier | `https://example.org/sightings/1` | `https://example.org/sightings/1/a` | `https://example.org/sightings/1/b` |
+| `dwc:eventID` | | `https://example.org/sightings/1` | `https://example.org/sightings/1` |
+| `dwc:eventDate`, position | when and where | from the event | from the event |
+| `dwc:basisOfRecord` | `HumanObservation` | | |
+| `dwc:organismID` | | `https://example.org/pods/1` | `https://example.org/pods/1` |
+| `dwc:scientificName` | | *Orcinus orca* | *Orcinus orca* |
+| `dwc:individualCount` | | 5 | 2 |
+| `dwc:sex` | | female | |
+| `dwc:lifeStage` | | adult | calf |
+
+: A sighting of an orca pod as one event and two occurrences (illustrative) {#tbl-orca-example}
+
+::: {.callout-warning title="Open question"}
+Which controlled vocabularies are used for `dwc:sex` and `dwc:lifeStage`?
+Darwin Core recommends one for each but does not prescribe it, and its examples do not include cetacean life stages such as *calf*.
+:::
+
+::: {.callout-warning title="Open question"}
+[NCF-SEM-003](../overview/semantic-model.qmd#ncf-sem-003) requires the from, to and type of a relationship to be IRIs,
+but Darwin Core allows plain identifiers and a free-text relationship type.
+How are Darwin Core relationships carried without breaking that requirement?
+:::
+
+::: {.callout-warning title="Open question"}
+How does a constrained transport such as AIS or NMEA 2000 carry an event with several occurrences,
+or tell the receiver that the breakdown has been lost ([NCF-SEM-012](../overview/semantic-model.qmd#ncf-sem-012))?
+:::
+
+## Hazards and conditions
+
+::: {.callout-warning title="To be written"}
+Floating debris, fishing gear and other temporary obstructions; shoaling and changing waterway conditions;
+protected areas and management zones. Identify existing vocabularies to reuse. Make sure this covers hazard
+types defined in AIS Area Notice and Geographic Notice ASMs.
+:::
+
+## Confirmation and feedback
+
+::: {.callout-warning title="To be written"}
+How an observer confirms, disputes or updates an existing observation.
+
+How an authority confirms a report and upgrades its confidence level.
+:::

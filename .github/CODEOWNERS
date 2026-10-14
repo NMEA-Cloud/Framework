@@ -1,0 +1,9 @@
+# Who must review changes to which parts of the framework.
+# Uncomment and replace with real GitHub users or teams once they exist,
+# then turn on "Require review from Code Owners" in the branch protection rule for main.
+#
+# *                       @NMEA-Cloud/editors
+# /overview/              @NMEA-Cloud/architecture
+# /vocab/                 @NMEA-Cloud/vocabularies
+# /bindings/ais.qmd       @NMEA-Cloud/ais
+# /bindings/pgns.qmd      @NMEA-Cloud/nmea2000

@@ -1,0 +1,53 @@
+# Sentence binding {#sec-binding-sentences}
+
+[Normative]{.status}
+
+## Overview
+
+Sentences are the text messages defined by NMEA 0183 (IEC 61162-1).
+This binding covers sentences on every transport that carries them:
+
+NMEA 0183
+: Serial links between instruments and displays on board.
+  It is long-established and very widely deployed.
+
+IEC 61162-450
+: Sentences over Ethernet.
+
+## Transport mechanics
+
+### NMEA 0183
+
+::: {.callout-warning title="To be written"}
+Getting current state; receiving changes; addressing and routing; constraints.
+:::
+
+### IEC 61162-450
+
+::: {.callout-warning title="To be written"}
+Getting current state; receiving changes; addressing and routing; constraints.
+:::
+
+## Representation
+
+Sentences that encapsulate AIS messages are a transport of the AIS binding (@sec-binding-ais), not part of this representation.
+
+::: {.callout-warning title="Open question"}
+Which existing sentences can carry framework concepts (for example for targets or waypoints), and are new sentences needed?
+:::
+
+## Fidelity
+
+::: {.callout-warning title="Open question"}
+Does IEC 61162-450 differ from NMEA 0183 serial links in what it can carry?
+:::
+
+## Trust
+
+::: {.callout-warning title="Open question"}
+Does IEC 61162-450 differ from NMEA 0183 serial links in how authenticity can be conveyed?
+:::
+
+## Requirements
+
+## Examples

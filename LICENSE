@@ -1,0 +1,35 @@
+NMEA Cloud Framework — licensing
+
+Safety information should not be confined to proprietary silos.
+Everything in this repository is openly licensed so that anyone —
+individuals, companies and governments — can read, implement and build on it
+without asking permission or paying.
+
+Different kinds of material use the license that suits them:
+
+  Framework text
+    All prose in this repository (the .qmd and .md files), except as below.
+    Creative Commons Attribution 4.0 International (CC BY 4.0)
+    See LICENSES/CC-BY-4.0.txt
+
+  Vocabularies and schemas
+    Everything under vocab/, including term definitions and any
+    machine-readable vocabulary, context or shape files.
+    CC0 1.0 Universal (public domain dedication)
+    See LICENSES/CC0-1.0.txt
+
+  Code, tools, configuration and examples
+    Build configuration, workflows, scripts, stylesheets, templates,
+    and code or data examples wherever they appear.
+    Apache License, Version 2.0
+    See LICENSES/Apache-2.0.txt
+
+These licenses cover this repository only. They do not apply to data that
+other people publish using the framework's vocabularies: the publisher of
+that data chooses its terms.
+
+Material from third parties (for example vocabularies the framework reuses)
+remains under its own license, as noted where it is used.
+
+Contributions are accepted under these same licenses, with a
+Developer Certificate of Origin sign-off. See CONTRIBUTING.md.

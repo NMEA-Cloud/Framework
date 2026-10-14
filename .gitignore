@@ -1,0 +1,13 @@
+# Quarto build output and caches
+/_book/
+/.quarto/
+*_files/
+*.quarto_ipynb
+
+# OS / editor
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
+!.vscode/tasks.json
+
+**/*.quarto_ipynb

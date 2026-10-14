@@ -1,0 +1,73 @@
+# About this document {.unnumbered}
+
+The NMEA Cloud Framework describes how vessels, their shore-side shadows and shore services share information in real time,
+so that everyone on the water has better situational awareness.
+
+It defines a **common semantic model** — what information *means* —
+and keeps that meaning consistent wherever the information travels:
+over the internet, over AIS, or across on-board NMEA 0183 and NMEA 2000 networks.
+
+## Status
+
+This is a **living framework document**, not a formal standard.
+It changes continuously as the working group develops it.
+The version published at <https://nmea-cloud.github.io/Framework/> is always the current one.
+
+Dated snapshots (PDF) are published from time to time for anyone who needs a fixed reference.
+A snapshot says on every page when it was taken; check the live version before relying on one.
+
+## How this document is organized
+
+Part I — Overview
+: Purpose, architecture, the semantic model and the trust model.
+  Everything else builds on this part.
+
+Part II — Vocabularies
+: The terms the semantic model is filled with, organized in domain modules that can grow independently.
+
+Part III — Bindings
+: How information travels over each transport, and how each semantic concept is represented on it.
+  Every binding follows the same template.
+
+Part IV — Applications
+: Worked applications of the framework: whale sightings (the proof of concept) and vessel data recording.
+  Informative only.
+
+## Conventions
+
+### Normative and informative content
+
+Each chapter starts by saying whether it is **normative** (it contains requirements an implementation must meet)
+or **informative** (explanation, background and examples).
+Examples, notes and diagrams are always informative.
+
+### Requirement keywords
+
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "NOT RECOMMENDED", "MAY", and "OPTIONAL" in this document
+are to be interpreted as described in BCP 14 [@rfc2119; @rfc8174] when, and only when, they appear in all capitals, as shown here.
+
+### Requirements
+
+Each requirement has a permanent identifier and is set out like this:
+
+::: {.requirement #ncf-example-001}
+**NCF-EXAMPLE-001** · *Draft*\
+An example requirement MUST have a permanent identifier.
+:::
+
+Identifiers are never renumbered or reused, so they can be cited safely from implementations, tests and other documents.
+A requirement that is withdrawn stays in place, marked *Withdrawn*.
+
+### Open questions
+
+Unresolved points are marked like this, and each should have a matching GitHub issue:
+
+::: {.callout-warning title="Open question"}
+An example of something the working group has not decided yet.
+:::
+
+## Contributing
+
+Anyone can propose a change — a correction, a new section, a new binding — by opening an issue or pull request
+on [GitHub](https://github.com/NMEA-Cloud/Framework).
+Human and AI contributors work the same way; see `CONTRIBUTING.md` and `AGENTS.md` in the repository.

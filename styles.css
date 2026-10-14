@@ -1,0 +1,42 @@
+/* Status banner shown at the top of every page */
+.ncf-banner {
+  border-left: 4px solid #d9822b;
+  background: rgba(217, 130, 43, 0.08);
+  padding: 0.5rem 0.9rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* "Normative" / "Informative" marker at the start of a chapter */
+.status {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.1rem 0.5rem;
+  border-radius: 0.25rem;
+  border: 1px solid currentColor;
+  opacity: 0.75;
+}
+
+/* Requirement blocks */
+.requirement {
+  border-left: 4px solid #2780e3;
+  background: rgba(39, 128, 227, 0.06);
+  padding: 0.6rem 0.9rem;
+  margin: 1rem 0;
+  scroll-margin-top: 4rem;
+}
+.requirement:target {
+  background: rgba(39, 128, 227, 0.18);
+}
+.requirement > p:last-child {
+  margin-bottom: 0;
+}
+
+/* Left-align table cells by default; an explicit alignment in the Markdown (e.g. ---:) still wins */
+table th,
+table td {
+  text-align: left;
+}

@@ -1,0 +1,59 @@
+# Bindings {#sec-bindings}
+
+[Informative]{.status}
+
+A **binding** connects the semantic model to one representation — a family of messages or formats, such as sentences or PGNs — and to each transport that carries it.
+Each binding answers two questions:
+
+1. **Representation** — how is each semantic concept encoded?
+   This is a mapping between the semantic model and the representation's own messages or formats.
+2. **Mechanics** — how does information move over each transport?
+   How does a participant get the current state, and how does it learn about changes?
+
+A binding defines its representation once, and its mechanics, fidelity and trust for each transport.
+
+Every binding must also say what the mapping **cannot** carry, and how identity, provenance and trust survive the journey
+(see @sec-consistency).
+
+## Bindings at a glance
+
+| Binding | Where it is used | Character |
+|:---|:---|:---|
+| @sec-binding-json-ld | Vessel ↔ shore, shore ↔ shore, on board where IP is available | Full fidelity; request/response and subscription |
+| @sec-binding-ais | Ship ↔ ship and ship ↔ shore over VHF; on board in sentences and PGNs | Broadcast or addressed; very limited message size and bandwidth |
+| @sec-binding-sentences | On board, over NMEA 0183 and IEC 61162-450 | Text sentences; widely deployed in commercial |
+| @sec-binding-pgns | On board, over NMEA 2000 and OneNet | Binary parameter groups (PGNs); small payloads on NMEA 2000, longer on OneNet |
+
+: The initial bindings {#tbl-bindings}
+
+## Binding template
+
+Every binding chapter uses the same sections, so bindings are easy to compare and new ones easy to add.
+To start a new binding, copy `bindings/_template.qmd` in the repository.
+
+Overview
+: What the representation is, which transports carry it, where it is used, and what it is good and bad at.
+
+Transport mechanics
+: Getting current state; receiving changes; addressing and routing; size, rate and connectivity constraints.
+  One subsection per transport where there is more than one.
+
+Representation
+: For each semantic concept the binding carries, how it is encoded. Usually a mapping table.
+
+Fidelity
+: What cannot be carried, and how a receiver can tell that information is incomplete, for each transport where they differ.
+
+Trust
+: How authenticity, identity and provenance are conveyed or preserved, for each transport where they differ.
+
+Requirements
+: The binding's own requirements, with identifiers `NCF-BND-<binding>-<nnn>`.
+
+Examples
+: Worked examples, ideally using the applications in Part IV.
+
+See [provisional decision 0008](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0008-bindings-by-representation.md).
+
+Where one binding's messages are carried inside another's — for example AIS messages in sentences or PGNs on board — the outer messages are a transport of the inner binding.
+A receiver extracts the inner message and handles it under the inner binding.

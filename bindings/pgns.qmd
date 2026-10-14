@@ -1,0 +1,56 @@
+# PGN binding {#sec-binding-pgns}
+
+[Normative]{.status}
+
+## Overview
+
+PGNs are the parameter groups defined by NMEA 2000, each identified by a Parameter Group Number.
+This binding covers PGNs on every transport that carries them:
+
+NMEA 2000
+: The CAN-based network connecting instruments, displays and machinery on board.
+
+OneNet
+: NMEA's standard for networks on board over IP.
+  It is link-local, and carries PGNs with longer messages than NMEA 2000 where needed.
+
+This binding is how framework information reaches current-generation displays, and how vessel data enters the framework for sharing and recording.
+
+## Transport mechanics
+
+### NMEA 2000
+
+::: {.callout-warning title="To be written"}
+Getting current state; receiving changes; addressing and routing; constraints.
+:::
+
+### OneNet
+
+::: {.callout-warning title="To be written"}
+Getting current state; receiving changes; addressing and routing; constraints.
+:::
+
+## Representation
+
+PGNs that carry AIS messages are a transport of the AIS binding (@sec-binding-ais), not part of this representation.
+
+::: {.callout-warning title="Open question"}
+Which existing PGNs can carry framework concepts, and are new PGNs needed?
+How does vessel data on the bus map to the vessel data vocabulary (@sec-vocab-vessel-data)?
+:::
+
+## Fidelity
+
+::: {.callout-warning title="Open question"}
+What is the maximum message size on OneNet, and can a OneNet message carry what an NMEA 2000 message cannot, such as full identifiers?
+:::
+
+## Trust
+
+::: {.callout-warning title="Open question"}
+Can a OneNet message carry a persistent signature (@sec-trust-security)?
+:::
+
+## Requirements
+
+## Examples

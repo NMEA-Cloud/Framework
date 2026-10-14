@@ -1,0 +1,183 @@
+# JSON-LD binding {#sec-binding-json-ld}
+
+[Normative]{.status}
+
+## Overview
+
+The JSON-LD binding carries framework information over the internet and other IP networks:
+between vessels and their shadows, between shore services, and on board wherever IP is available.
+It is the only binding expected to carry information at **full fidelity**.
+
+This binding covers JSON-LD on every transport that carries it:
+
+HTTP
+: The baseline transport.
+
+CoAP
+: An alternative transport for constrained devices and links, including group communication over IP multicast.
+
+## Transport mechanics
+
+The working proposal (see [decision record 0003](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0003-things-as-web-resources.md)):
+
+- Every Thing is a **web resource**, identified by its IRI.
+- **HTTP** [@rfc9110] is the baseline protocol, using its standard methods.
+
+### HTTP
+
+See [provisional decision 0009](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0009-json-ld-over-http.md).
+
+::: {.callout-note title="HTTP versions"}
+HTTP/1.1 [@rfc9112] is the baseline version; a server can also offer HTTP/2 [@rfc9113] or HTTP/3 [@rfc9114] ([NCF-BND-JSONLD-001](#ncf-bnd-jsonld-001)).
+A client can find which versions a server supports from the `alpn` parameter of the server's DNS HTTPS resource record [@rfc9460].
+:::
+
+#### Getting current state
+
+Retrieve the resource at the Thing's IRI with `GET`.
+
+#### Publishing
+
+Send a Thing to a server with a mutating method such as `POST`, `PUT` or `PATCH` [@rfc5789].
+
+#### Receiving changes
+
+A participant learns of changes by one of:
+
+Polling
+: Repeating `GET` on the resource.
+
+Server-sent events
+: A stream of change notifications from the server over HTTP [@whatwg-html].
+
+WebSocket
+: A two-way connection [@rfc6455], for a participant that both sends and receives.
+
+MQTT
+: The server refers the participant to an MQTT broker [@mqtt5] and a topic on which changes are published.
+
+#### Addressing and routing
+
+A Thing is addressed by its IRI.
+
+An MQTT broker is addressed by an `mqtt:` or `mqtts:` URI.
+These schemes are provisionally registered with IANA and identify only the broker, not a topic.
+This binding extends them so that the path gives the topic, for example `mqtts://broker.example.org/vessels/1/sightings`.
+
+::: {.callout-warning title="Open question"}
+Is the topic given in the URI path, as above, or in a separate property alongside a broker-only URI, as in the W3C Web of Things MQTT binding?
+If in the path, how are the MQTT wildcards `+` and `#` encoded, given that `#` begins a URI fragment?
+:::
+
+#### Constraints
+
+::: {.callout-warning title="To be written"}
+Operation over intermittent, metered and high-latency links (for example satellite).
+:::
+
+### CoAP
+
+See [provisional decision 0010](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0010-coap-transport.md).
+
+CoAP [@rfc7252] is a web transfer protocol for constrained devices and networks, carried over UDP.
+
+#### Getting current state
+
+Retrieve the resource with `GET`.
+
+#### Publishing
+
+Send a Thing with a mutating method such as `POST` or `PUT`.
+
+#### Receiving changes
+
+A participant learns of changes by one of:
+
+Polling
+: Repeating `GET` on the resource.
+
+Observe
+: The participant registers with the server and receives a notification each time the resource changes [@rfc7641].
+
+Group communication
+: The server sends changes to an IP multicast group, as specified in `draft-ietf-core-groupcomm-bis`.
+
+#### Addressing and routing
+
+A Thing is addressed by a `coap:` or `coaps:` URI.
+A multicast group is addressed by a group URI: a `coap:` URI whose host is the group's IP multicast address, for example `coap://[ff02::fd]/sightings`.
+
+::: {.callout-note title="Group communication specification"}
+`draft-ietf-core-groupcomm-bis` replaces RFC 7390 [@rfc7390], the Experimental specification of CoAP group communication, and will obsolete it when published.
+It is intended as a Proposed Standard, but is still an Internet-Draft and may change before publication.
+:::
+
+#### Constraints
+
+::: {.callout-warning title="To be written"}
+Message size: a JSON-LD Thing with a persistent signature may not fit in one UDP datagram (see the compact forms to be written under Representation).
+Link-local multicast does not leave the network it is sent on, so group communication is limited to the vessel's own network.
+:::
+
+## Representation
+
+JSON-LD [@json-ld11] is the basic representation of Things.
+
+A payload is JSON.
+Its JSON-LD context is given in one of two ways:
+
+- an `@context` property in the document, served as `application/ld+json`; or
+- over HTTP, a `Link` header with the relation `http://www.w3.org/ns/json-ld#context`, with the document served as `application/json`.
+
+The JSON-LD representation of a Thing links to each mechanism for receiving changes other than polling, with the link relation type `monitor` [@rfc5989; @rfc8288] ([NCF-BND-JSONLD-002](#ncf-bnd-jsonld-002)).
+The target URI identifies the mechanism: an `https:` URI for server-sent events, a `wss:` URI for a WebSocket, an `mqtts:` URI for an MQTT broker and topic, a `coaps:` URI for CoAP Observe, or a `coap:` group URI for CoAP group communication.
+RFC 5989 defines `monitor` links to SIP URIs and leaves other URI schemes to other specifications; this binding defines them for these schemes.
+
+In a JSON-LD document, a `monitor` link is a property named by the IANA relation IRI `http://www.iana.org/assignments/relation/monitor`.
+
+::: {.callout-warning title="Open question"}
+Is the IANA relation IRI a stable identifier for this use?
+RFC 5988 [@rfc5988] described this form of relation IRI, but RFC 8288, which replaced it, does not.
+If it is not stable, a term in a framework vocabulary is used instead.
+:::
+
+::: {.callout-warning title="To be written"}
+JSON-LD contexts for each vocabulary module; content negotiation; compact forms for constrained links.
+:::
+
+## Fidelity
+
+All Things can be carried without loss.
+
+## Trust
+
+- Transport security: TLS for HTTP, with servers identified by WebPKI certificates; DTLS for `coaps:` [@rfc7252].
+- Client identity: OpenID Connect; authorization: OAuth 2.0 (@sec-trust-security).
+- Persistent signatures: JWS over the JSON-LD representation.
+
+OSCORE [@rfc8613] can protect CoAP messages end to end, including through proxies.
+Like TLS and DTLS, it protects a message in transit, not the Thing after it is received, so it does not replace a persistent signature.
+Group OSCORE, an Internet-Draft (`draft-ietf-core-oscore-groupcomm`), would extend this protection to group communication.
+Without it, a Thing sent to a multicast group is protected only by its persistent signature.
+
+::: {.callout-warning title="Open question"}
+Is OSCORE used to protect CoAP messages, and Group OSCORE for group communication once it is published?
+:::
+
+## Requirements
+
+::: {.requirement #ncf-bnd-jsonld-001}
+**NCF-BND-JSONLD-001** · *Draft*\
+A server that offers HTTP MUST allow a client to negotiate HTTP/1.1, and MAY also allow HTTP/2 or HTTP/3.
+:::
+
+::: {.requirement #ncf-bnd-jsonld-002}
+**NCF-BND-JSONLD-002** · *Draft*\
+The JSON-LD representation of a Thing SHOULD include a `monitor` link for each mechanism, other than polling, by which changes to the Thing can be received.
+:::
+
+## Examples
+
+::: {.callout-warning title="To be written"}
+A whale sighting as JSON-LD (@sec-app-whales).
+:::

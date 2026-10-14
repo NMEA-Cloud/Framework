@@ -1,0 +1,73 @@
+project:
+  type: book
+  output-dir: _book
+  # Only the book itself is rendered; README, AGENTS.md, decisions/ etc. are repo docs.
+  render:
+    - index.qmd
+    - overview/*.qmd
+    - vocab/*.qmd
+    - bindings/*.qmd
+    - applications/*.qmd
+    - appendices/*.qmd
+
+book:
+  title: "NMEA Cloud Framework"
+  subtitle: "Living framework document"
+  author: "NMEA Cloud working group"
+  date: last-modified
+  date-format: "D MMMM YYYY"
+  site-url: https://nmea-cloud.github.io/Framework/
+  repo-url: https://github.com/NMEA-Cloud/Framework
+  repo-branch: main
+  repo-actions: [edit, issue, source]
+  search: true
+  page-navigation: true
+  chapters:
+    - index.qmd
+    - part: overview/index.qmd
+      chapters:
+        - overview/architecture.qmd
+        - overview/semantic-model.qmd
+        - overview/trust-security.qmd
+    - part: vocab/index.qmd
+      chapters:
+        - vocab/core.qmd
+        - vocab/observations.qmd
+        - vocab/vessel-data.qmd
+    - part: bindings/index.qmd
+      chapters:
+        - bindings/json-ld.qmd
+        - bindings/ais.qmd
+        - bindings/sentences.qmd
+        - bindings/pgns.qmd
+    - part: applications/index.qmd
+      chapters:
+        - applications/whale-sightings.qmd
+        - applications/recording.qmd
+  appendices:
+    - appendices/glossary.qmd
+    - appendices/references.qmd
+
+bibliography: references.bib
+number-sections: true
+number-depth: 3
+lang: en-US
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    css: styles.css
+    toc: true
+    toc-depth: 3
+    include-before-body: _includes/status-banner.html
+    mermaid:
+      theme: neutral
+  typst:
+    # PDF snapshots only: built by .github/workflows/snapshot.yml when a release is tagged.
+    papersize: a4
+    toc: true
+    section-numbering: "1.1.1"
+    include-before-body: _includes/snapshot-banner.typ
+    citeproc: true

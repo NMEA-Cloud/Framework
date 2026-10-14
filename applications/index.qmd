@@ -1,0 +1,13 @@
+# Applications {#sec-applications}
+
+[Informative]{.status}
+
+This part shows the framework applied end to end. It is **informative**: nothing here adds requirements.
+
+The two applications are deliberately different.
+**Whale sightings** need information shared in real time between many participants who do not know each other.
+**Recording** needs a single vessel's data captured with consistent meaning and verifiable integrity.
+That one semantic model serves both is a test of the framework's design.
+
+Each application should be traced through every binding it uses,
+so it also serves as a worked example for the binding chapters.

@@ -1,0 +1,140 @@
+# Semantic model {#sec-semantic-model}
+
+[Normative]{.status}
+
+The semantic model is the core of the framework.
+It defines how information is described so that it means the same thing to every participant,
+whatever transport carried it and whatever system produced or consumes it.
+
+This chapter defines the *mechanism* — Things, identifiers, relationships, schemas and the rules for consistency.
+The *content* — the actual terms for vessels, observations, vessel data and so on — is defined in the vocabularies (Part II).
+
+## Things
+
+Everything the framework describes is a **Thing**.
+
+- Tangible Things: a vessel, a buoy, a whale, a piece of floating debris.
+- Intangible Things: an observation, an area, a notice, a voyage record.
+- The model describes itself in the same way: **relationships** and **schemas** are Things too.
+
+Treating everything uniformly means the same mechanisms — identity, versioning, signing, exchange — work for all of it.
+
+::: {.callout-warning title="Open question"}
+How is a collection of Things, such as "hazards in my area", identified and referred to, so that it can be monitored for new members (@sec-binding-json-ld)?
+For a collection defined by an area: how is the scope of the area defined, and how does the collection follow a vessel whose area changes as it moves?
+:::
+
+## Identity
+
+::: {.requirement #ncf-sem-001}
+**NCF-SEM-001** · *Draft*\
+Every Thing MUST be identified by an IRI [@rfc3987].
+:::
+
+::: {.requirement #ncf-sem-002}
+**NCF-SEM-002** · *Draft*\
+A Thing's identifier MUST NOT change when the Thing is updated or when it is carried over a different transport.
+:::
+
+To ensure long term stability of identifiers, authorities should consider use of a persistent redirect service such as `w3id.org`.
+
+### Namespaces
+
+The primary namespacing mechanism is the authority component of resource IRIs. 
+
+- For hierarchical IRIs, such as ones using the `https:` scheme, the authority component should be registered in the Internet Domain Naming System.
+- For URNs, authority is assigned by the namespace owner registered with [IANA](https://www.iana.org/assignments/urn-namespaces).
+
+**Maritime Resource Names** (MRNs, `urn:mrn:…`) [@iala-r1023], used by the Maritime Connectivity Platform and Smart Shipping initiatives, provide a method for identifying maritime organizations and their resources within a subset of this framework.
+
+## Relationships {#sec-relationships}
+
+Everything is connected.
+A relationship is itself a Thing, with at least a **from**, a **to** and a **type** —
+for example *this observation* — *was made by* — *this vessel*.
+
+::: {.requirement #ncf-sem-003}
+**NCF-SEM-003** · *Draft*\
+A relationship MUST identify the Thing it is from, the Thing it is to, and its type, each by IRI.
+:::
+
+Because relationships are Things, they can be signed, versioned and exchanged like anything else.
+
+::: {.callout-warning title="To be written"}
+Relationships for data ownership and responsibility.
+For example, an observer works for a research organization, on a field trip sponsored by an agency; a crew member serves on a vessel, on a voyage.
+A field trip and a voyage are alike: each is a period of activity that relates persons, organizations and vessels to the data produced during it.
+These relationships extend the responsible parties of devices (@sec-responsible-parties).
+:::
+
+## Schemas and meaning
+
+The meaning of a Thing is given by its **schema**, and schemas are themselves Things.
+This is what makes the framework a living one: meaning can be defined, extended and redefined
+without changing the framework itself.
+
+Schemas are grouped into vocabularies (Part II), which reuse established vocabularies where applicable.
+As different communities describe the same thing from different **perspectives** — a biologist and a navigator describe a whale sighting differently — the model supports **mapping between vocabularies**.
+
+::: {.callout-warning title="To be written"}
+Schema definition language; versioning and evolution of schemas; how mappings between vocabularies are expressed.
+:::
+
+Core vocabularies defined or referenced in Part II include:
+
+- Time
+- Quantitative Value, including Systems of Units
+- Geometry, including Position and Shape
+- Identity, including Person and Organization
+- Creative Work, including Report and Notice with Revision History
+
+## Rights and usage {#sec-rights}
+
+The framework's vocabularies are public domain (see Part II), but that says nothing about the **information** described with them.
+A sighting, a hazard report or a vessel's recorded data belongs to whoever published it, on terms they choose.
+A government agency may publish openly; a commercial service may attach conditions.
+Receivers need to be able to tell which applies.
+
+::: {.requirement #ncf-sem-020}
+**NCF-SEM-020** · *Draft*\
+It MUST be possible for a publisher to state the license or usage terms that apply to any Thing.
+:::
+
+::: {.callout-warning title="To be written"}
+Which property expresses the terms (for example `dcterms:license`); how terms are inherited, for example by the observations in a collection;
+and how they are carried, or at least referenced, over constrained transports.
+:::
+
+## Consistency across transports {#sec-consistency}
+
+The framework's central promise is that **information means the same thing everywhere in the system**.
+A whale sighting published over IP, relayed over AIS and shown on a chartplotter via NMEA 2000
+is the same sighting, with the same meaning, throughout.
+
+Bindings (Part III) keep that promise. Each binding defines how semantic concepts are represented on its transport.
+
+::: {.requirement #ncf-sem-010}
+**NCF-SEM-010** · *Draft*\
+A binding MUST define, for every concept it carries, how that concept is represented on its transport.
+:::
+
+::: {.requirement #ncf-sem-011}
+**NCF-SEM-011** · *Draft*\
+A representation MUST NOT change the meaning of the information it represents.
+:::
+
+::: {.requirement #ncf-sem-012}
+**NCF-SEM-012** · *Draft*\
+Where a transport cannot carry all of a Thing, the binding MUST state what is lost and how a receiver can tell that the information is incomplete.
+:::
+
+::: {.requirement #ncf-sem-013}
+**NCF-SEM-013** · *Draft*\
+A binding MUST preserve, or make recoverable, the identity ([NCF-SEM-001](#ncf-sem-001)) and provenance (@sec-trust-security) of every Thing it carries.
+:::
+
+::: {.callout-warning title="Open question"}
+Should there be one **reference representation** (for example JSON-LD [@json-ld11]) that every binding maps to and from?
+That would make each binding a single mapping rather than a mapping to every other binding.
+See [decision record 0003](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0003-things-as-web-resources.md).
+:::

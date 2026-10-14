@@ -1,0 +1,144 @@
+# Glossary {#sec-glossary}
+
+Terms are defined here once and used consistently throughout. Add new terms in the same change that first uses them.
+
+AIS
+: Automatic Identification System — VHF-based exchange of vessel and navigational information [@itu-m1371].
+
+ASM
+: Application-specific message — application data carried in AIS binary messages [@imo-sn1-circ289].
+
+AtoN
+: Aid to navigation.
+
+Binding
+: The definition of how the semantic model is carried in one representation, and over each transport that carries it (Part III).
+
+Class A
+: A shipborne AIS station that meets the IMO carriage requirement for AIS [@itu-m1371].
+
+Class B
+: A shipborne AIS station not necessarily meeting the IMO carriage requirement, which transmits a restricted set of messages.
+  A Class B CS station accesses the channel by carrier sense, a Class B SO station by self-organized time division [@itu-m1371].
+
+CoAP
+: Constrained Application Protocol — a web transfer protocol for constrained devices and networks, carried over UDP [@rfc7252].
+
+Data owner
+: An organization or person that originates a Thing or is responsible for it, and signs it with a persistent signature.
+
+Event
+: In Darwin Core, something that happens at a place during a period of time, such as a sighting.
+  An event can contain several occurrences (@sec-vocab-observations).
+
+Fidelity
+: How completely a binding can represent a Thing.
+
+Gateway
+: An on-board component connecting a vessel's own networks to the framework.
+
+GeoJSON
+: A JSON format for geographic features [@rfc7946].
+
+HTTPS resource record
+: A DNS record describing how to connect to an HTTP service, including which HTTP versions it supports [@rfc9460].
+
+IEC 61162-450
+: Carriage of sentences over Ethernet.
+
+IMO
+: International Maritime Organization — the United Nations agency responsible for the safety of shipping [@imo-ais].
+
+IRI
+: Internationalized Resource Identifier [@rfc3987] — the form of every Thing's identifier.
+
+JSON-FG
+: OGC Features and Geometries JSON — an extension of GeoJSON [@ogc-json-fg].
+
+JSON-LD
+: A JSON-based format for linked data [@json-ld11]; the basic representation of Things in the JSON-LD binding.
+
+Link relation
+: The type of a link from one resource to another, such as `monitor` [@rfc8288].
+
+Management area
+: An area in which official rules apply to vessels, such as limits on speed.
+
+MCP
+: Maritime Connectivity Platform — a framework for maritime digital services, including identity registries that issue certificates to maritime organizations, vessels, devices and services [@iala-g1183].
+
+MQTT
+: A publish/subscribe messaging protocol in which clients exchange messages on topics through a broker [@mqtt5].
+
+MRN
+: Maritime Resource Name — a URN namespace (`urn:mrn:`) for identifying maritime resources [@iala-r1023].
+
+Namespace
+: The part of an identifier controlled by one naming authority, within which that authority defines terms or identifies Things.
+
+Occurrence
+: In Darwin Core, organisms of one kind and state present at a place and time; itself a kind of event (@sec-vocab-observations).
+
+OneNet
+: NMEA's standard for on-board networks over IP; link-local, carrying PGNs.
+
+OSCORE
+: Object Security for Constrained RESTful Environments — protection of CoAP messages end to end [@rfc8613].
+
+PATON
+: Private AtoN.
+
+PGN
+: Parameter Group Number — identifies a message type on NMEA 2000 and OneNet.
+
+Private AtoN (PATON)
+: An aid to navigation operated by a body other than the national authority responsible for aids to navigation.
+  In the United States, any aid to navigation not maintained by the U.S. Coast Guard [@uscg-paton].
+
+Provenance
+: The record of who originated a piece of information and who relayed or transformed it.
+
+Representation
+: A family of messages or formats onto which a binding maps semantic concepts, such as sentences or PGNs.
+
+Responsible party
+: A person, organization or vessel to which a device's identity rolls up, in a given role, such as owner, charterer or master (@sec-responsible-parties).
+
+Semantic model
+: The framework's common definition of what information means (@sec-semantic-model).
+
+Sentence
+: A text message defined by NMEA 0183 (IEC 61162-1).
+
+Server-sent events
+: A one-way stream of events from a server to a client over HTTP [@whatwg-html].
+
+Shadow
+: A shore-side representative of a vessel, holding its state and acting for it while it is out of reach.
+
+Shore station
+: An AIS station on land, operated by the national authority responsible for aids to navigation or, under a private AtoN identifier, by another body.
+
+SOLAS
+: The International Convention for the Safety of Life at Sea, whose Chapter V requires many ships to carry AIS [@imo-ais].
+
+Thing
+: Anything the framework describes, tangible or intangible — including relationships and schemas.
+
+Transparency log
+: A public, append-only log of certificates or signatures, which anyone can audit.
+
+Transport
+: A network or link that carries a binding's representation, for example NMEA 2000 or OneNet.
+
+VDES
+: VHF Data Exchange System.
+
+Vocabulary
+: A module of classes and properties for one domain (Part II).
+
+WebPKI
+: The public key infrastructure of certificate authorities whose root certificates are trusted by web browsers' root programs.
+
+WebSocket
+: A protocol for two-way communication between a client and a server over one connection [@rfc6455].

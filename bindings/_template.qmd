@@ -1,0 +1,52 @@
+# <Representation name> binding {#sec-binding-xxx}
+
+[Normative]{.status}
+
+<!--
+  Template for a new binding. Copy this file to bindings/<name>.qmd,
+  replace the placeholders, and add it to the chapters list in _quarto.yml.
+  Keep the section headings so bindings stay comparable.
+  If more than one transport carries the representation, put the mechanics
+  under one ### heading per transport (with #### for the subsections), and
+  give Fidelity and Trust a subsection per transport where they differ.
+  Requirement IDs for this binding: NCF-BND-<NAME>-001, -002, ...
+-->
+
+## Overview
+
+What the representation is, which transports carry it, where it is used, and its strengths and limits.
+
+## Transport mechanics
+
+### Getting current state
+
+### Receiving changes
+
+### Addressing and routing
+
+### Constraints
+
+Message size, rate, bandwidth and connectivity.
+
+## Representation
+
+| Semantic concept | Representation | Notes |
+|---|---|---|
+| | | |
+
+## Fidelity
+
+What cannot be carried, and how a receiver knows the information is incomplete.
+
+## Trust
+
+How authenticity, identity and provenance are conveyed or preserved.
+
+## Requirements
+
+::: {.requirement #ncf-bnd-xxx-001}
+**NCF-BND-XXX-001** · *Draft*\
+Requirement text.
+:::
+
+## Examples

@@ -1,0 +1,38 @@
+# Publish a dated PDF snapshot as a GitHub release when a version tag (e.g. 2026.1) is pushed.
+name: Snapshot
+
+on:
+  push:
+    tags: ['[0-9][0-9][0-9][0-9].*']
+
+permissions:
+  contents: write
+
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.10.19
+      - name: Install headless browser (for diagrams)
+        run: quarto install chrome-headless-shell --no-prompt
+      - name: Stamp snapshot banner
+        run: |
+          DATE=$(date -u +%Y-%m-%d)
+          sed -i \
+            -e "s|^#let snapshot-version = .*|#let snapshot-version = \"${GITHUB_REF_NAME}\"|" \
+            -e "s|^#let snapshot-date = .*|#let snapshot-date = \"${DATE}, commit ${GITHUB_SHA::7}\"|" \
+            _includes/snapshot-banner.typ
+      - name: Render PDF
+        run: quarto render --to typst
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PDF="NMEA-Cloud-Framework-${GITHUB_REF_NAME}.pdf"
+          mv _book/NMEA-Cloud-Framework.pdf "$PDF"
+          gh release create "$GITHUB_REF_NAME" "$PDF" \
+            --title "Snapshot ${GITHUB_REF_NAME}" \
+            --notes "Dated snapshot of the NMEA Cloud Framework. The current version is always at https://nmea-cloud.github.io/Framework/"

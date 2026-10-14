@@ -1,0 +1,30 @@
+# Build every pull request and check its links, so problems are caught before merge.
+name: Check
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.10.19
+      - name: Render website
+        run: quarto render --to html 2>&1 | tee render.log
+      - name: Fail on render warnings
+        run: |
+          if grep -qi "WARN" render.log; then
+            echo "::error::Quarto reported warnings; see the Render website step."
+            exit 1
+          fi
+      - name: Check internal links
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --offline --no-progress '_book/**/*.html'
+          fail: true

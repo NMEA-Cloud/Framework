@@ -1,0 +1,27 @@
+# Core vocabulary {#sec-vocab-core}
+
+[Normative]{.status}
+
+Terms used by every other module: the participants in the framework and the common building blocks of time and place.
+
+## Candidate terms
+
+::: {.callout-note title="Placeholder"}
+This section is a placeholder.
+The terms, meanings and sources below are candidates and have not been agreed.
+:::
+
+| Term | Meaning | Possible source |
+|---|---|---|
+| Vessel | A ship or boat taking part in the framework | NMEA data dictionary — *to be confirmed* |
+| Organization | A provider, operator or other body | schema.org `Organization` |
+| Person | An individual, for example an observer | schema.org `Person` |
+| Position | A point on the Earth's surface, with accuracy | *To be decided* |
+| Area | A region, for example a management zone | schema.org `GeoShape` — *to be confirmed* |
+| Time | An instant or interval | ISO 8601 / `xsd:dateTime` |
+
+: Candidate core terms {#tbl-core-terms}
+
+::: {.callout-warning title="To be written"}
+Agree the term list, definitions and sources. Position, area and time must match the rules in @sec-semantic-model.
+:::

@@ -1,0 +1,226 @@
+# AIS binding {#sec-binding-ais}
+
+[Normative]{.status}
+
+## Overview
+
+AIS [@itu-m1371] reaches vessels over VHF without any internet connection, ship to ship and ship to shore.
+It is valuable precisely where IP is unavailable, but its messages are small and its channel capacity is shared and limited.
+
+This binding covers AIS messages on every transport that carries them:
+
+VHF
+: The AIS data link, ship to ship and ship to shore.
+
+Sentences
+: On board, AIS messages encapsulated in sentences over NMEA 0183 or IEC 61162-450.
+
+PGNs
+: On board, AIS messages carried in PGNs over NMEA 2000 or OneNet.
+
+### Participants
+
+National shore stations
+: Shore stations operated by the national authority responsible for aids to navigation.
+
+Private AtoN shore stations
+: Shore stations operated by other bodies under private AtoN identifiers, singly or in networks (@sec-ais-trust).
+
+Commercial vessels
+: Usually carry Class A stations, which accept messages to transmit from the vessel's network (@sec-ais-constraints).
+  Many are required to carry AIS (@tbl-ais-carriage).
+
+Recreational vessels
+: Carry Class B stations, AIS receivers or no AIS equipment.
+  Class B stations transmit a restricted set of messages, and none is known to accept messages to transmit from the vessel's network (@sec-ais-constraints).
+  Some are required to carry AIS (@tbl-ais-carriage).
+
+| Rules | Vessels required to carry AIS | Class |
+|:---|:---|:---|
+| SOLAS [@imo-ais] | Ships of 300 gross tonnage and upwards on international voyages; cargo ships of 500 gross tonnage and upwards not on international voyages; all passenger ships | Not specified; a Class A station meets the IMO carriage requirement [@itu-m1371] |
+| The Bahamas [@bs-act-2025-61] | Foreign-owned vessels of 50 ft and over in Bahamian waters, with AIS on at all times | Not specified |
+| Canada [@ca-sor-2020-216] | Vessels of 20 m or more other than pleasure craft; vessels carrying more than 50 passengers, dangerous goods or pollutants in bulk; some dredges; towboats of 8 m or more | Class A |
+| | Other passenger-carrying vessels on voyages beyond sheltered waters | Class A or B |
+| European Union [@eu-dir-2002-59; @eu-reg-1224-2009] | Passenger ships of any size, and other ships of 300 gross tonnage and upwards, calling at a port of a Member State or on domestic voyages | Not specified; equipment meets the SOLAS requirements |
+| | Fishing vessels over 15 m flying a Member State flag, operating in Member State waters or landing catch in a Member State port | Class A |
+| United Kingdom [@uk-si-2020-673; @uk-si-2004-2110] | SOLAS requirements, applied to UK ships and to foreign ships in UK waters; fishing vessels over 15 m; some ships on domestic voyages | Not specified; equipment meets the SOLAS requirements |
+| United States [@cfr-33-164-46] | Self-propelled commercial vessels of 65 ft or more; towing vessels of 26 ft or more over 600 hp; vessels certificated for more than 150 passengers; some dredging vessels; vessels carrying certain dangerous cargoes | Class A |
+| | Some fishing, small passenger and dredging vessels | Class A or B |
+
+: Examples of rules requiring vessels to carry AIS {#tbl-ais-carriage}
+
+A shore station receives the position reports and static data of vessels in range, and can send them addressed and broadcast messages.
+
+### Applications
+
+Applications of this binding include:
+
+- **Management area alerts.** A shore station alerts a vessel that approaches an official management area and meets the area's criteria, such as size and speed, with an addressed message identifying the area and the regulation that applies (@sec-ais-example-area-alert).
+- **Sightings.** A shore station relays a sighting to vessels nearby (@sec-app-whales).
+- **Local alerts.** A station broadcasts a short alert to stations in range.
+
+## Transport mechanics
+
+### VHF
+
+#### Getting current state
+
+No mechanism is defined.
+
+::: {.callout-warning title="Open question"}
+Should an ASM be defined for requesting information from another station?
+:::
+
+#### Receiving changes
+
+A station receives changes as messages that other stations send unsolicited.
+
+#### Addressing and routing
+
+Broadcast and addressed messages.
+
+#### Constraints {#sec-ais-constraints}
+
+Constraints are from ITU-R M.1371-6 [@itu-m1371]; table numbers refer to that Recommendation.
+
+A slot carries 256 bits.
+A message occupies up to 3 slots, or up to 5 slots where FATDMA reservations can be used.
+
+| Message | Maximum content | Content that fits in 1 / 2 / 3 / 5 slots |
+|:---|:---|:---|
+| 6 Addressed binary | 16-bit application identifier and 920 bits of application data | 8 / 36 / 64 / 117 bytes (Table 53) |
+| 8 Binary broadcast | 16-bit application identifier and 952 bits of application data | 12 / 40 / 68 / 121 bytes (Table 56) |
+| 12 Safety related addressed | 156 six-bit characters | 10 / 48 / 85 / 156 characters (Table 60) |
+| 14 Safety related broadcast | 161 six-bit characters | 16 / 53 / 90 / 161 characters (Table 62) |
+| 25 Single slot binary | 1 slot only | 80 to 128 bits, depending on addressing and coding (Table 80) |
+| 26 Multiple slot binary | 1 004 bits of data in 5 slots | — |
+
+: AIS message sizes {#tbl-ais-message-sizes}
+
+Class B CS stations (Table 42):
+
+- transmit position reports (message 18) and static data (message 24), and respond to interrogations for them;
+- may transmit message 14, entered manually, without pre-formatted text or automatic repetition, in 1 slot (16 characters);
+- may transmit message 13 to acknowledge message 12, if they process message 12;
+- do not transmit messages 6, 8, 12, 25 or 26.
+
+Class B SO stations:
+
+- transmit messages 6 and 8 in at most 3 slots (64 and 68 bytes);
+- transmit message 12 in at most 3 slots (85 characters);
+- transmit message 14 in at most 3 slots (90 characters);
+- respond to interrogations for messages 18 and 24 (Table 63).
+
+Neither class of Class B station interrogates other stations (Table 63).
+
+To have a message transmitted, an on-board gateway passes it to the AIS station over the vessel's network:
+
+- Class A stations accept messages to transmit over NMEA 0183: an ABM sentence carries an addressed message and a BBM sentence a broadcast message.
+  This is confirmed in practice.
+- Class A stations that output PGNs over NMEA 2000 may not accept messages to transmit over NMEA 2000.
+- No Class B station is known to accept ABM or BBM sentences over NMEA 0183.
+
+::: {.callout-warning title="Open question"}
+How can a gateway on a vessel with Class B equipment have framework messages transmitted over AIS, given that Class B SO stations may transmit messages 6, 8, 12 and 14 but no known Class B station accepts them from the vessel's network?
+:::
+
+::: {.callout-warning title="Open question"}
+ITU-R M.1371-6 has no table of the messages a Class B SO station transmits, as Table 42 does for Class B CS; limits are given message by message.
+Which messages besides 6, 8, 12 and 14 can Class B SO stations transmit, and in how many slots?
+:::
+
+::: {.callout-warning title="Open question"}
+ITU-R M.1371-6 is inconsistent for Class B CS and message 12.
+Table 42 says a Class B CS station does not transmit message 12, but the description of message 12 limits a Class B CS station to 1 slot (10 characters).
+Can a Class B CS station transmit message 12?
+:::
+
+::: {.callout-warning title="To be written"}
+Slot usage and channel load; range; the messages permitted to other station types.
+:::
+
+### Sentences
+
+The mechanics are those of the sentence binding's transports, NMEA 0183 and IEC 61162-450 (@sec-binding-sentences).
+
+### PGNs
+
+PGNs carry AIS messages intact, with a PGN for each AIS message type.
+The mechanics are those of the PGN binding's transports, NMEA 2000 and OneNet (@sec-binding-pgns).
+
+## Representation
+
+Framework information is carried in AIS messages [@itu-m1371], including:
+
+- **application-specific messages** (ASMs) in the addressed binary message (message 6) and the binary broadcast message (message 8),
+  following IMO guidance on their use [@imo-sn1-circ289];
+- the **safety related addressed message** (message 12) and the **safety related broadcast message** (message 14).
+
+| Concept | AIS message |
+|:---|:---|
+| Official management area | Area Notice or Geographic Notice ASM |
+| Management area alert | Message 12 with text identifying the area and the regulation; an addressed Area Notice ASM (candidate, to be tested) |
+| Sighting, from shore to ship | Area Notice ASM whose sub-area is a point |
+| Local alert | Message 14 with defined text |
+| Additional information about any of these | Linked Text ASM (candidate) |
+
+: Concepts carried over AIS {#tbl-ais-concepts}
+
+See [provisional decision 0012](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0012-ais-messages-for-concepts.md).
+
+::: {.callout-warning title="Open question"}
+Can an Area Notice also carry a sighting from ship to ship or from ship to shore?
+What text does message 14 carry for a local alert?
+Which other concepts need AIS messages, and are new ASMs needed for them?
+How are IRIs reduced to identifiers small enough for AIS?
+:::
+
+## Fidelity
+
+::: {.callout-warning title="To be written"}
+Which concepts and properties survive the mapping; how a receiver knows a Thing is incomplete and where to find the full version.
+:::
+
+::: {.callout-warning title="Open question"}
+What is lost when an AIS message is carried on board in sentences or PGNs rather than received over VHF?
+:::
+
+## Trust {#sec-ais-trust}
+
+Over VHF, trust comes from regulation: transmissions are monitored and regulated under official policies.
+For example, a shore station transmits under a private AtoN identifier.
+See [provisional decision 0013](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0013-trust-over-vhf.md).
+
+::: {.callout-warning title="Open question"}
+How are private AtoN identifiers assigned to networks of shore stations, especially networks whose coverage overlaps geographically?
+:::
+
+::: {.callout-warning title="Open question"}
+Persistent signatures will not fit in an ASM. See the open question in @sec-trust-security.
+:::
+
+## Requirements
+
+## Examples
+
+### Management area alert {#sec-ais-example-area-alert}
+
+An official management area has rules for vessels above a given length and speed.
+A network of private AtoN shore stations covers the area.
+
+1. A commercial vessel with a Class A station approaches the area.
+2. The network receives the vessel's position reports and static data, and finds that the vessel meets the area's criteria.
+3. The network sends the vessel a message 12 whose text identifies the area and the regulation that applies.
+4. The vessel's Class A station passes the message to the vessel's network, where a display presents it.
+
+::: {.callout-warning title="Open question"}
+Should the alert be carried in an Area Notice ASM in message 6 instead of, or as well as, message 12?
+The Area Notice ASM is to be tested for this purpose.
+How does the alert identify the regulation that applies?
+:::
+
+### Whale sighting
+
+::: {.callout-warning title="To be written"}
+A whale sighting relayed over AIS (@sec-app-whales).
+:::

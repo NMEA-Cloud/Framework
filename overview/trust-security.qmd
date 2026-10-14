@@ -1,0 +1,139 @@
+# Trust and security {#sec-trust-security}
+
+[Normative]{.status}
+
+Information is only useful if a receiver can decide how far to trust it.
+This chapter defines how the origin and integrity of information can be verified,
+who may publish and read what, and how the provenance of information is kept as it moves through the system.
+
+## Authenticity
+
+Every Thing can be authenticated with a **digital signature**. The framework distinguishes two kinds:
+
+Ephemeral signatures
+: Protect a communication session — for example TLS session keys.
+  They show the information was not altered *in transit on that link*, but say nothing once it has arrived.
+
+Persistent signatures
+: Are attached to the information itself and stay with it when it is stored, relayed or re-published.
+  They show who originated it, wherever it is found.
+
+The two can be combined. Persistent signatures allow trust to be maintained as information journeys across several links and transports.
+
+::: {.requirement #ncf-tru-001}
+**NCF-TRU-001** · *Draft*\
+It MUST be possible to attach a persistent signature to any Thing.
+:::
+
+The working proposal is to use JOSE: JWS [@rfc7515] for signatures and JWE [@rfc7516] for encryption,
+applied to the JSON-LD representation, with identifiers for the algorithms used.
+See [decision record 0004](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0004-trust-stack.md).
+
+Some transports, such as AIS or NMEA 2000, may not have sufficient bandwidth to accommodate signatures or other message authentication tags.
+The mechanism used to establish trust must be defined by each binding.
+
+## Identity and authorization
+
+The working proposal:
+
+- **Servers** are identified by WebPKI certificates, which can be domain validated.
+- **Data owners** are identified separately from servers, by certificates at one of two tiers (@sec-data-owners).
+- **Clients** are identified using OpenID Connect [@oidc-core].
+- **Authorization** uses OAuth 2.0 [@rfc6749], under policies set by the owner of each resource.
+
+### Data owners {#sec-data-owners}
+
+A data owner's certificate verifies its persistent signatures.
+There are two tiers of confidence in a data owner's identity:
+
+Tier 1: legal entity
+: The data owner's identity as a legal entity is verified, in one of two ways:
+
+  - **Trusted certificate authority.** A certificate authority on the framework's trust list verifies the data owner's identity and issues its certificate.
+    Examples are a government certificate authority and an MCP identity registry [@iala-g1183].
+    The certificate is independent of the data owner's servers.
+  - **Validated domain.** The data owner publishes its certificate on its own domain, and the certificate names that domain.
+    The server it is retrieved from has an organization-validated or extended-validation certificate, and the organization named in the data owner's certificate matches it.
+
+Tier 2: internet presence
+: Only the data owner's control of an internet identifier is verified, in one of two ways:
+
+  - **Domain.** The data owner publishes its certificate on its own domain, and the certificate names that domain.
+    The server it is retrieved from has a domain-validated certificate.
+  - **Individual.** The data owner's certificate binds its key to its OpenID Connect identity [@oidc-core].
+    For example, a certificate authority issues a short-lived certificate after the individual signs in, and records it in a transparency log [@sigstore-fulcio].
+    The working assumption is that the identity comes from one of these OpenID Connect providers:
+    providers of commonly used operating system platforms, such as Apple (iOS and macOS), Google (Android) and Microsoft (Windows);
+    other well-known providers, such as social media or maritime providers;
+    or providers with which the receiver has a private trust relationship, such as organizations, non-governmental organizations and manufacturers.
+
+  Tier 2 suits data owners for whom tier 1 is impractical, such as individual operators, and scales to large numbers of them.
+
+A receiver records which tier, and which way, applied when it verified a signature.
+
+See [provisional decision 0014](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0014-data-owner-identity.md).
+
+::: {.callout-warning title="Open question"}
+Who maintains the trust list for tier 1, and which certificate authorities does it include?
+Is the list published with the framework, or maintained by participants, given that the framework operates no infrastructure (@sec-architecture)?
+Root programs require hierarchies that issue TLS server certificates to be dedicated to TLS server authentication [@chrome-root-policy], so certificates from a trusted certificate authority come from other hierarchies.
+Which verification of identity is required, for example that of the Extended Validation Guidelines [@cabf-evg]?
+:::
+
+::: {.callout-warning title="Open question"}
+Verifying a certificate published on a domain depends on the domain still publishing it.
+How is a signature verified after the key is replaced or the domain lapses: by publishing retired certificates, by receivers keeping evidence of retrieval, or by a transparency log?
+:::
+
+::: {.callout-warning title="Open question"}
+How does a receiver decide which OpenID Connect providers it accepts for individuals?
+Which participants or existing public services operate the certificate authority and transparency log for them?
+:::
+
+::: {.callout-warning title="Open question"}
+How does a receiver learn that a data owner's certificate has been revoked?
+Are signatures timestamped, so that they can be verified after the certificate expires?
+How is the tier recorded in the provenance of a Thing?
+:::
+
+### Devices and responsible parties {#sec-responsible-parties}
+
+A device's identity rolls up to one or more responsible parties: persons, organizations and vessels.
+A device can have several responsible parties at once, each in a different role.
+For example, data from a device on a chartered vessel can trace to:
+
+- the vessel;
+- the vessel's owners;
+- the charter company;
+- the charterer;
+- the person in charge of the vessel, such as the master;
+- a crew member.
+
+Each link from a device to a responsible party is a relationship (@sec-relationships), so it can be signed, versioned and exchanged like any other Thing.
+
+See [provisional decision 0016](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0016-responsible-parties.md).
+
+::: {.callout-warning title="Open question"}
+Which roles of responsible parties need terms in the vocabularies?
+Relationships change over time, for example with each charter: how is the period of a relationship recorded, so that a receiver can tell which responsible parties applied when data was produced?
+Who may assert a relationship between a device and a responsible party, and does the responsible party have to confirm it?
+Does a device sign data itself, or does a responsible party sign for it?
+:::
+
+::: {.callout-warning title="To be written"}
+Identity of vessels and on-board devices; role of official identifiers like MMSI alongside smaller vessels and mobile applications.
+:::
+
+## Provenance and authority
+
+::: {.callout-warning title="To be written"}
+How the framework records who originated a piece of information, who relayed or transformed it, and on whose authority.
+How authoritative sources are distinguished from other contributors, and how confidence is expressed.
+:::
+
+## Threat model
+
+::: {.callout-warning title="To be written"}
+Assets, threat actors and threats (spoofed hazards, suppressed warnings, replay of stale information, compromised sources, privacy of vessel data),
+and which mechanisms in this chapter address each.
+:::

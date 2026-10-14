@@ -1,0 +1,44 @@
+# Vocabularies {#sec-vocab}
+
+[Informative]{.status}
+
+Part I defines *how* information is described. This part defines *what* it is described with:
+the classes and properties for vessels, observations, vessel data and everything else the framework carries.
+
+Vocabularies are organized as **modules**, one per domain, so that a new domain can be added
+— or an existing one extended — without changing the framework itself.
+
+Wherever possible a module **reuses established vocabularies** rather than inventing terms:
+
+- **schema.org** for general-purpose concepts such as organizations, places and events;
+- **domain vocabularies** such as Darwin Core [@darwin-core] for biological observations;
+- the **NMEA data dictionary** for vessel and instrument data, subject to licensing (below).
+
+Each module states, for every term, its definition, where it comes from, and how it relates to terms in other vocabularies.
+
+## Licensing
+
+Vocabularies are public infrastructure.
+Everything in this part, and every machine-readable vocabulary file, is dedicated to the public domain under **CC0**,
+so the terms can be copied into any implementation, data catalog or device without conditions.
+
+This applies to the *vocabularies*, not to *data* that uses them: publishers choose the terms of their own information (@sec-rights).
+Vocabularies reused from elsewhere keep their own licenses and are referred to by IRI rather than copied.
+
+### NMEA Data Dictionary
+The data dictionary for NMEA 0183 Sentences and NMEA 2000 PGNs is distributed under NMEA's standards license.
+Users of these bindings should contact NMEA to license these definitions.
+
+## Managing vocabularies
+
+- **Terms are permanent.** A term is never deleted or redefined; it can be deprecated.
+  A change that would break existing data needs a new term.
+- **Each term has a status:** *proposed*, *stable* or *deprecated*.
+- **Anyone can extend.** Because schemas are Things, anyone can define terms in their own namespace without permission.
+  This repository governs only the core modules. Widely used extensions can be proposed for inclusion.
+- **Namespaces** are not yet decided (@sec-semantic-model).
+
+See [provisional decision 0005](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0005-vocabulary-management.md).
+
+Vocabularies defined by this document are published as machine-readable files
+(see [provisional decision 0007](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0007-machine-readable-vocabularies.md)).

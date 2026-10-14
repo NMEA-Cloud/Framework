@@ -1,0 +1,16 @@
+# Vessel data {#sec-vocab-vessel-data}
+
+[Normative]{.status}
+
+Terms for the data a vessel produces about itself — navigation, environment, machinery and systems —
+for sharing in real time and for recording (@sec-app-recording).
+
+On board, this data already exists on NMEA 0183 and NMEA 2000 networks.
+This module gives it a meaning independent of those networks,
+so that it can be shared and recorded consistently and mapped back onto any on-board network.
+How it relates to the **NMEA data dictionary** depends on that dictionary's licensing (see [Licensing](index.qmd#licensing)).
+
+::: {.callout-warning title="To be written"}
+Scope of the first version (for example position, heading, speed, depth, wind, engine data);
+how time series and sampling rates are represented; mapping to NMEA data dictionary terms.
+:::

@@ -1,0 +1,87 @@
+# Architecture {#sec-architecture}
+
+[Informative]{.status}
+
+This chapter describes the overall shape of the framework: the principles it follows, the participants in it, and how information moves between them.
+
+## Tenets
+
+Safety information should not be confined to proprietary silos
+: Information that affects safety at sea must be available to everyone who needs it — individuals, companies and governments alike.
+  The framework, its vocabularies and its bindings are openly licensed so that anyone can implement them without permission or fees.
+
+Consistent semantic model
+: All participants share one model of what information means (@sec-semantic-model).
+  Transports differ; meaning does not.
+
+Transport independence
+: No transport is architecturally privileged.
+  IP, AIS, NMEA 0183, IEC 61162-450, NMEA 2000 and OneNet are each reached through a binding (Part III), and new transports can be added the same way.
+
+Trust travels with the information
+: Authenticity is a property of the information itself, not only of the channel it arrived on (@sec-trust-security).
+
+No central operator
+: The framework is a mesh. Anyone can publish, route or consume information; nobody has to operate a central hub.
+  The framework itself operates no infrastructure, and in particular none needed at runtime, such as certificate authorities, revocation lists or transparency logs.
+  Participants provide these.
+  See [provisional decision 0015](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0015-no-framework-infrastructure.md).
+
+Intermittent connectivity is normal
+: Links between vessels, and between vessels and shore, are assumed to be intermittent, variable-bandwidth and costly.
+  The design must work well when they are.
+
+Existing on-board systems keep working
+: The framework adds information to existing navigation workflows.
+  It must never make an existing system less safe or less available when the framework is degraded or absent.
+
+## Participants
+
+```{mermaid}
+%%| fig-cap: "Participants and the paths information can take between them (illustrative)."
+flowchart LR
+  subgraph VA[Vessel A]
+    IA[Instruments & displays] --- GA[Gateway]
+  end
+  subgraph VB[Vessel B]
+    GB[Gateway] --- IB[Instruments & displays]
+  end
+  subgraph Shore
+    SA[Shadow of A]
+    SB[Shadow of B]
+    SVC[Shore services<br/>e.g. authoritative providers,<br/>sighting networks]
+  end
+  GA -- "IP (when connected)" --- SA
+  GB -- "IP (when connected)" --- SB
+  SA --- SVC
+  SB --- SVC
+  SA --- SB
+  GA -. "AIS" .- GB
+```
+
+Vessel
+: A ship or boat taking part in the framework. On board, its instruments and displays communicate over NMEA 0183, NMEA 2000 or other networks.
+
+Gateway
+: An on-board component that connects the vessel's own networks to the framework, translating between bindings.
+
+Shadow
+: A shore-side representative of a vessel. It holds the vessel's current state, accepts information on its behalf,
+  and synchronizes with the vessel whenever a link is available.
+
+Shore service
+: Any service ashore that publishes, enriches, routes or consumes information.
+  Some are **authoritative** for particular kinds of information; others are contributors.
+
+Client
+: Any application that consumes or presents framework information, on board or ashore.
+
+## How information moves
+
+Because links are intermittent and information is plentiful, every participant needs two things:
+
+1. a way to **get the current state** of the things it cares about; and
+2. a way to **subscribe to changes** so it can receive timely notifications.
+
+Notification of changes could come from simple polling, or from events raised by the origin of the information or a delegate.
+Mechanisms may include HTTP events, MQTT brokers, VHF broadcast or IP multicast.

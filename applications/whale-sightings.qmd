@@ -1,0 +1,38 @@
+# Whale sightings {#sec-app-whales}
+
+[Informative]{.status}
+
+Whale sightings were the framework's **proof of concept**.
+They are a clear example of real-time situational awareness that current standards do not provide:
+a sighting is useful to vessels nearby for minutes to hours, it may come from a mariner, a shore network or an automated detector,
+and it needs to reach vessels whether or not they are connected to the internet.
+
+## Flow
+
+```{mermaid}
+%%| fig-cap: "A sighting from origin to helm (illustrative)."
+sequenceDiagram
+  participant O as Observer
+  participant S as Shore sighting<br/>service
+  participant SH as Shadow of<br/>Vessel B
+  participant G as Vessel B<br/>gateway
+  participant D as Vessel B<br/>display
+  participant A as Vessel A AIS<br/>(AIS only)
+  participant DA as Vessel A<br/>display
+  O->>S: Report sighting<br/>(IP, signed)
+  S->>SH: Notify of sighting in<br/>area of interest (IP)
+  SH->>G: Deliver when<br/>connected (IP)
+  G->>D: Present on<br/>chartplotter<br/>(NMEA 2000)
+  S->>A: Broadcast via shore station<br/>(AIS)
+  A->>DA: AIS message<br/>in a PGN<br/>(NMEA 2000)
+```
+
+At every step it is **the same sighting**: same identity, same meaning, same provenance —
+carried at full fidelity over IP and in reduced form over AIS and NMEA 2000.
+
+## Walkthrough
+
+::: {.callout-warning title="To be written"}
+The sighting as a Thing (@sec-vocab-observations); its representation in each binding;
+how a vessel decides it is relevant; how it expires; how other mariners confirm it.
+:::
