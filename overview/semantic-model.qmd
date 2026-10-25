@@ -260,6 +260,9 @@ Each update that gives a new value restates it with a later time, so a value tha
 at the origin and at every cached representation, whether or not they are in contact.
 A value that lapses keeps its last value, marked as no longer current, and the Thing is not deleted: an AIS target that is lost, for example, remains at its IRI, marked as lost.
 
+A message is a change to a Thing if it changes anything about it, its validity included.
+A reading repeated with the same value is therefore a change, since it renews the value's validity, while a notice repeated with the same content is not, since its validity has a fixed end.
+
 A value whose validity differs from the rest of a Thing's, such as a vessel's position beside its name, is a Thing of its own, to which the vessel refers (@sec-relationships).
 It then has its own versions and its own validity, and an update to it restates nothing else.
 

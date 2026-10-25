@@ -33,6 +33,7 @@ They are the priority for group review.
 | [0027](0027-notifications-and-change-requests.md) | Change notifications as links, and changes made by request |
 | [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding |
 | [0029](0029-changes-and-vessels-over-ais.md) | Changes, cancellation, aliases and vessels over AIS |
+| [0030](0030-on-board-bindings.md) | Identity, changes, validity and trust in the sentence and PGN bindings |
 
 ## All decisions
 
@@ -67,6 +68,7 @@ They are the priority for group review.
 | [0027](0027-notifications-and-change-requests.md) | Change notifications as links, and changes made by request | Provisional |
 | [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding | Provisional |
 | [0029](0029-changes-and-vessels-over-ais.md) | Changes, cancellation, aliases and vessels over AIS | Provisional |
+| [0030](0030-on-board-bindings.md) | Identity, changes, validity and trust in the sentence and PGN bindings | Provisional |
 
 ## Statuses
 

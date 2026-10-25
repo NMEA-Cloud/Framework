@@ -150,6 +150,17 @@ The mechanics are those of the sentence binding's transports, NMEA 0183 and IEC 
 PGNs carry AIS messages intact, with a PGN for each AIS message type.
 The mechanics are those of the PGN binding's transports, NMEA 2000 and OneNet (@sec-binding-pgns).
 
+### Relaying and synthesizing on board {#sec-ais-on-board}
+
+A gateway can pass AIS messages to the vessel's network in sentences or PGNs, where displays present them.
+Relaying a message that was broadcast over VHF, as the vessel's AIS station received it, is a relay (@sec-provenance): the message keeps the trust of VHF (@sec-ais-trust).
+Synthesizing an AIS message on board, for example to show a notice the gateway received over IP as though it had been heard over VHF, is done today, but it lends the message a trust it has not earned, and it may be prohibited in future.
+
+::: {.callout-warning title="Open question"}
+How does a gateway give displays a notice it received over IP, if synthesizing AIS messages on board is not allowed: by PGNs or sentences of the PGN and sentence bindings, and are new ones needed?
+How does a display tell a relayed AIS message from a synthesized one?
+:::
+
 ## Representation
 
 Framework information is carried in AIS messages [@itu-m1371], including:
@@ -189,7 +200,8 @@ Create
 
 Update
 : A message under an alias the receiver holds, whose content differs from what it holds.
-  A repetition with the same content is not a change, and makes no new version.
+  A repetition with the same content is not a change, and makes no new version, since a notice's validity has a fixed end that a repetition does not renew (@sec-validity).
+  A vessel's position report is different: each one renews the validity of the vessel's dynamic properties, so it is a change even when they are unchanged (@sec-ais-vessels).
 
 AIS has no delete.
 A withdrawal is an update (@sec-changes): the Area Notice and Geographic Notice ASMs of DAC 366 and DAC 367 cancel a notice with a message under the same linkage identifier whose area type is cancellation and whose duration is 0 [@asm-366-22; @asm-367-22],

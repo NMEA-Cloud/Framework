@@ -103,6 +103,9 @@ MQTT
 MRN
 : Maritime Resource Name — a URN namespace (`urn:mrn:`) for identifying maritime resources [@iala-r1023].
 
+NAME
+: The identifier with which an NMEA 2000 device claims its source address; on board, an alias of the device, which can change (@sec-binding-pgns).
+
 Namespace
 : The part of an identifier controlled by one naming authority, within which that authority defines terms or identifies Things.
 
@@ -172,6 +175,9 @@ Sighting
 
 SOLAS
 : The International Convention for the Safety of Life at Sea, whose Chapter V requires many ships to carry AIS [@imo-ais].
+
+Talker identifier
+: The part of an NMEA 0183 sentence that identifies its source; together with the port it arrived on, an alias of the source (@sec-binding-sentences).
 
 Thing
 :Anything the framework describes, tangible or intangible — including relationships and schemas.
