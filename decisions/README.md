@@ -32,6 +32,7 @@ They are the priority for group review.
 | [0026](0026-rights-and-usage.md) | Usage terms as licenses, by version and by inheritance |
 | [0027](0027-notifications-and-change-requests.md) | Change notifications as links, and changes made by request |
 | [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding |
+| [0029](0029-changes-and-vessels-over-ais.md) | Changes, cancellation, aliases and vessels over AIS |
 
 ## All decisions
 
@@ -65,6 +66,7 @@ They are the priority for group review.
 | [0026](0026-rights-and-usage.md) | Usage terms as licenses, by version and by inheritance | Provisional |
 | [0027](0027-notifications-and-change-requests.md) | Change notifications as links, and changes made by request | Provisional |
 | [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding | Provisional |
+| [0029](0029-changes-and-vessels-over-ais.md) | Changes, cancellation, aliases and vessels over AIS | Provisional |
 
 ## Statuses
 

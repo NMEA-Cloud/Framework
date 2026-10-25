@@ -94,6 +94,9 @@ Management area
 MCP
 : Maritime Connectivity Platform — a framework for maritime digital services, including identity registries that issue certificates to maritime organizations, vessels, devices and services [@iala-g1183].
 
+MMSI
+: Maritime Mobile Service Identity — the number that identifies a station in the maritime mobile service, such as an AIS station [@itu-m585]; over AIS, an alias of the vessel or other Thing that the station belongs to (@sec-ais-vessels).
+
 MQTT
 : A publish/subscribe messaging protocol in which clients exchange messages on topics through a broker [@mqtt5].
 
