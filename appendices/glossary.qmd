@@ -2,6 +2,10 @@
 
 Terms are defined here once and used consistently throughout. Add new terms in the same change that first uses them.
 
+Alias
+: An identifier a transport gives a Thing in place of its IRI, such as an AIS station and linkage identifier.
+  An alias may be temporary, and one Thing may have several (@sec-ais-identity).
+
 AIS
 : Automatic Identification System — VHF-based exchange of vessel and navigational information [@itu-m1371].
 
@@ -11,8 +15,19 @@ ASM
 AtoN
 : Aid to navigation.
 
+Authority
+: A participant that issues notices under its own responsibility, such as a maritime administration or a wildlife management agency.
+  Anyone can issue a notice; whether a receiver acts on it depends on its trust in the issuer (@sec-vocab-notices).
+
 Binding
 : The definition of how the semantic model is carried in one representation, and over each transport that carries it (Part III).
+
+Cached representation
+: A copy of a Thing held by anyone but its origin, changed only with changes from the origin (@sec-origins).
+
+Change
+: The creation, update or deletion of a Thing (@sec-changes).
+  Withdrawing a Thing is an update, and its expiry a scheduled update.
 
 Class A
 : A shipborne AIS station that meets the IMO carriage requirement for AIS [@itu-m1371].
@@ -24,8 +39,17 @@ Class B
 CoAP
 : Constrained Application Protocol — a web transfer protocol for constrained devices and networks, carried over UDP [@rfc7252].
 
+Contractual relationship
+: A relationship that binds both of the Things it relates, such as a charter, and holds only when the owners of both have signed it (@sec-relationships).
+
+Data Integrity
+: The W3C specification for embedding a signature, as a proof, in a linked data document, made over the document's canonical RDF [@vc-data-integrity]; the form of persistent signatures (@sec-trust-security).
+
 Data owner
 : An organization or person that originates a Thing or is responsible for it, and signs it with a persistent signature.
+
+Designation
+: A relationship in which one party names another as authoritative for a kind of information in an area; the way authority is conferred (@sec-provenance).
 
 Event
 : In Darwin Core, something that happens at a place during a period of time, such as a sighting.
@@ -62,7 +86,7 @@ Link relation
 : The type of a link from one resource to another, such as `monitor` [@rfc8288].
 
 Management area
-: An area in which official rules apply to vessels, such as limits on speed.
+: An area in which official rules apply to vessels, such as limits on speed; a Thing of its own, to which notices refer (@sec-management-areas).
 
 MCP
 : Maritime Connectivity Platform — a framework for maritime digital services, including identity registries that issue certificates to maritime organizations, vessels, devices and services [@iala-g1183].
@@ -76,17 +100,29 @@ MRN
 Namespace
 : The part of an identifier controlled by one naming authority, within which that authority defines terms or identifies Things.
 
+Notice
+: A Thing produced by an authority about an area or about other Things, such as a management zone or an exclusion zone around a whale (@sec-vocab-notices).
+
 Occurrence
 : In Darwin Core, organisms of one kind and state present at a place and time; itself a kind of event (@sec-vocab-observations).
 
 OneNet
 : NMEA's standard for on-board networks over IP; link-local, carrying PGNs.
 
+Organism
+: In Darwin Core, a particular organism or a group recorded as one, such as a pod of orca; a Thing with its own identity, observed in sightings (@sec-sightings-organisms).
+
+Origin
+: The server, or servers, that hold a Thing for its owner and alone apply changes to it; a split origin, such as a vessel and its shadow, merges any branches of a Thing's versions across its servers (@sec-origins).
+
 OSCORE
 : Object Security for Constrained RESTful Environments — protection of CoAP messages end to end [@rfc8613].
 
 PATON
 : Private AtoN.
+
+Persistent signature
+: A signature attached to a Thing that stays with it when it is stored, relayed or re-published; a Data Integrity proof over one version of the Thing (@sec-trust-security).
 
 PGN
 : Parameter Group Number — identifies a message type on NMEA 2000 and OneNet.
@@ -96,13 +132,19 @@ Private AtoN (PATON)
   In the United States, any aid to navigation not maintained by the U.S. Coast Guard [@uscg-paton].
 
 Provenance
-: The record of who originated a piece of information and who relayed or transformed it.
+: The record of who originated a piece of information and who relayed or transformed it: the Thing's own, stated and signed by its owner, and each copy's, recorded by the participant that holds it (@sec-provenance).
+
+Relationship
+: A link from one Thing to another, of a stated type: a property of the Thing it is from, or a Thing of its own when it has an owner, a period or a signature of its own (@sec-relationships).
 
 Representation
 : A family of messages or formats onto which a binding maps semantic concepts, such as sentences or PGNs.
 
 Responsible party
 : A person, organization or vessel to which a device's identity rolls up, in a given role, such as owner, charterer or master (@sec-responsible-parties).
+
+Scheduled change
+: A change given in advance with the time at which it takes effect, applied then if the Thing is still at the version it was scheduled against, such as a notice's expiry (@sec-changes).
 
 Semantic model
 : The framework's common definition of what information means (@sec-semantic-model).
@@ -119,11 +161,14 @@ Shadow
 Shore station
 : An AIS station on land, operated by the national authority responsible for aids to navigation or, under a private AtoN identifier, by another body.
 
+Sighting
+: An observation of one or more organisms at a place and time: a Darwin Core occurrence, or an event containing occurrences (@sec-sightings-organisms).
+
 SOLAS
 : The International Convention for the Safety of Life at Sea, whose Chapter V requires many ships to carry AIS [@imo-ais].
 
 Thing
-: Anything the framework describes, tangible or intangible — including relationships and schemas.
+:Anything the framework describes, tangible or intangible — including relationships and schemas.
 
 Transparency log
 : A public, append-only log of certificates or signatures, which anyone can audit.
@@ -131,8 +176,17 @@ Transparency log
 Transport
 : A network or link that carries a binding's representation, for example NMEA 2000 or OneNet.
 
+Usage terms
+: What a holder may do with a copy of a Thing, stated by its owner as a license, possibly an ODRL policy; distinct from who may access the Thing (@sec-rights).
+
+Validity
+: How long a value holds in the world, expressed as a scheduled update that marks it as no longer current; distinct from how long a cached representation may be used (@sec-validity).
+
 VDES
 : VHF Data Exchange System.
+
+Version
+: The state of a Thing from one change until the next, identified by an IRI of its own, distinct from the Thing's (@sec-versions).
 
 Vocabulary
 : A module of classes and properties for one domain (Part II).

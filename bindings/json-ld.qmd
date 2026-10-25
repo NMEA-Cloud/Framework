@@ -153,7 +153,7 @@ All Things can be carried without loss.
 
 - Transport security: TLS for HTTP, with servers identified by WebPKI certificates; DTLS for `coaps:` [@rfc7252].
 - Client identity: OpenID Connect; authorization: OAuth 2.0 (@sec-trust-security).
-- Persistent signatures: JWS over the JSON-LD representation.
+- Persistent signatures: Data Integrity proofs over the canonical RDF dataset of the Thing's version, embedded in the JSON-LD representation ([NCF-TRU-002](../overview/trust-security.qmd#ncf-tru-002)).
 
 OSCORE [@rfc8613] can protect CoAP messages end to end, including through proxies.
 Like TLS and DTLS, it protects a message in transit, not the Thing after it is received, so it does not replace a persistent signature.
@@ -178,6 +178,4 @@ The JSON-LD representation of a Thing SHOULD include a `monitor` link for each m
 
 ## Examples
 
-::: {.callout-warning title="To be written"}
-A whale sighting as JSON-LD (@sec-app-whales).
-:::
+Examples of an organism, a sighting and a notice as JSON-LD are in @sec-examples.

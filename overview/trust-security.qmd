@@ -25,14 +25,48 @@ The two can be combined. Persistent signatures allow trust to be maintained as i
 It MUST be possible to attach a persistent signature to any Thing.
 :::
 
-The working proposal is to use JOSE: JWS [@rfc7515] for signatures and JWE [@rfc7516] for encryption,
-applied to the JSON-LD representation, with identifiers for the algorithms used.
-See [decision record 0004](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0004-trust-stack.md).
+A persistent signature is a W3C Data Integrity proof [@vc-data-integrity], embedded in the Thing's representation and made over the canonical form of its RDF dataset [@rdf-canon],
+with a cryptosuite such as `eddsa-rdfc-2022` [@vc-di-eddsa] or `ecdsa-rdfc-2019` [@vc-di-ecdsa].
+Because it signs the RDF rather than the bytes, one signature verifies the Thing in any representation that maps to that RDF, JSON-LD with any context or CBOR-LD, and survives re-serialization by caches and relays.
+JWE [@rfc7516] remains the working proposal for encryption.
+See [decision record 0004](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0004-trust-stack.md) and [provisional decision 0024](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0024-data-integrity-signatures.md).
+
+A signature covers one version of a Thing (@sec-versions): its state, including the Thing's IRI, the version's IRI and the versions it succeeds.
+The proof is not part of the version, since a Data Integrity proof is excluded from what it signs: adding a signature, such as the second party's to a contractual relationship (@sec-relationships), makes no new version.
+Several signers each add a proof of their own, forming a proof set.
+The owner of a Thing can sign in advance the version that a scheduled change produces ([NCF-SEM-042](semantic-model.qmd#ncf-sem-042)), and the scheduled change carries that proof, so that a cached representation that applies the change holds a version its owner signed (@sec-changes).
+
+::: {.requirement #ncf-tru-002}
+**NCF-TRU-002** · *Draft*\
+A persistent signature MUST be a Data Integrity proof over the canonical RDF dataset of one version of a Thing.
+:::
+
+Canonicalizing a dataset is cheap when it has no blank nodes, since it then amounts to sorting its statements; blank nodes can make it costly.
+A Thing that is signed therefore gives every node an IRI, or holds structured values as JSON literals.
+
+::: {.requirement #ncf-tru-003}
+**NCF-TRU-003** · *Draft*\
+A Thing that is persistently signed SHOULD contain no blank nodes.
+:::
+
+A participant that relays a Thing does not sign it.
+A relay that needs to add an assurance of its own wraps the Thing in a Thing of its own, which it signs, and which is treated as derived from the Thing it wraps (@sec-provenance).
+
+::: {.requirement #ncf-tru-004}
+**NCF-TRU-004** · *Draft*\
+A participant that relays a Thing MUST NOT add a proof of its own to the Thing.
+:::
+
+::: {.callout-warning title="Open question"}
+How does a Data Integrity proof's verification method relate to a data owner's certificate (@sec-data-owners)?
+Which cryptosuites must a receiver support, given what constrained devices can compute?
+How does a scheduled change carry the proof of the version it produces?
+:::
 
 Some transports, such as AIS or NMEA 2000, may not have sufficient bandwidth to accommodate signatures or other message authentication tags.
 The mechanism used to establish trust must be defined by each binding.
 
-## Identity and authorization
+## Identity and authorization {#sec-identity-authorization}
 
 The working proposal:
 
@@ -110,13 +144,13 @@ For example, data from a device on a chartered vessel can trace to:
 - a crew member.
 
 Each link from a device to a responsible party is a relationship (@sec-relationships), so it can be signed, versioned and exchanged like any other Thing.
+Relationships change over time, for example with each charter: a relationship's period is its validity, and its earlier versions tell a receiver which responsible parties applied when data was produced (@sec-relationships).
+A link to a responsible party is contractual: it holds only when the device's owner and the responsible party have both signed it ([NCF-SEM-006](semantic-model.qmd#ncf-sem-006)), so that no one can make a party responsible for data without its agreement.
 
 See [provisional decision 0016](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0016-responsible-parties.md).
 
 ::: {.callout-warning title="Open question"}
 Which roles of responsible parties need terms in the vocabularies?
-Relationships change over time, for example with each charter: how is the period of a relationship recorded, so that a receiver can tell which responsible parties applied when data was produced?
-Who may assert a relationship between a device and a responsible party, and does the responsible party have to confirm it?
 Does a device sign data itself, or does a responsible party sign for it?
 :::
 
@@ -124,12 +158,62 @@ Does a device sign data itself, or does a responsible party sign for it?
 Identity of vessels and on-board devices; role of official identifiers like MMSI alongside smaller vessels and mobile applications.
 :::
 
-## Provenance and authority
+## Provenance and authority {#sec-provenance}
 
-::: {.callout-warning title="To be written"}
-How the framework records who originated a piece of information, who relayed or transformed it, and on whose authority.
-How authoritative sources are distinguished from other contributors, and how confidence is expressed.
+Provenance is described with the W3C PROV Ontology [@prov-o]: for example, `prov:wasAttributedTo` for the agent that made a Thing, `prov:wasDerivedFrom` for the Things it was derived from,
+and `prov:actedOnBehalfOf` for a device acting for a responsible party (@sec-responsible-parties).
+
+A Thing's provenance is of two kinds:
+
+The Thing's own
+: Who made it, what it was derived from, and on whose behalf.
+  Its owner states this as part of the Thing, and signs it with the Thing.
+
+The copy's
+: How a particular copy reached a participant: over which transport and through which relays, when it was received, whether its signature verified and under which tier (@sec-data-owners), whether it is complete, and whether a scheduled change was applied to it by an unsynchronized clock (@sec-changes).
+  The participant that holds the copy records this.
+  It is not part of the Thing, and is not published as a change to it ([NCF-SEM-035](semantic-model.qmd#ncf-sem-035)), though the participant may publish it as a Thing of its own.
+
+A relay neither signs nor changes a Thing it relays ([NCF-TRU-004](#ncf-tru-004)), so the relays a Thing passed through belong to the provenance of each copy:
+for example, a notice heard over AIS from a base station by a vessel's AIS receiver, and passed on over NMEA 2000.
+A relay that wraps a Thing makes a Thing of its own, derived from the Thing it wraps.
+
+A Thing derived from others names each by the IRI of the version it used (@sec-versions), so that the derivation can be checked against exactly what it was made from, even after those Things change.
+For example, an organism's last known place names the version of the sighting it was derived from.
+
+::: {.requirement #ncf-tru-005}
+**NCF-TRU-005** · *Draft*\
+A Thing that states what it was derived from MUST name each input by the IRI of the version it used.
 :::
+
+### Authority
+
+Anyone can issue a notice (@sec-vocab-notices), and any participant can claim to be authoritative, so authority is not something a source claims for itself.
+It is conferred by a **designation**: a relationship (@sec-relationships), a Thing of its own, in which one party names another as authoritative for a kind of information in an area,
+such as a national maritime administration designating a wildlife agency for the management areas in its waters.
+A designation is signed by the party that makes it.
+A receiver chooses the parties it trusts directly, as it chooses the first tier's trust list of data owners (@sec-data-owners), and treats any other source as authoritative only through a chain of designations from one of them.
+A source without a designation is a contributor (@sec-architecture).
+
+::: {.requirement #ncf-tru-006}
+**NCF-TRU-006** · *Draft*\
+A receiver MUST treat a source as authoritative only if the receiver trusts the source directly, or a chain of designations from a party it trusts names the source as authoritative.
+:::
+
+::: {.callout-warning title="Open question"}
+Must the designated party also sign a designation, making it a contractual relationship ([NCF-SEM-006](semantic-model.qmd#ncf-sem-006))?
+May a designated party designate others in turn, and how long may a chain of designations be?
+In what terms does a designation name a kind of information and an area?
+:::
+
+### Confidence
+
+Confidence is of two kinds, as provenance is.
+Confidence in the content is the owner's to state, in the terms of each vocabulary: a position's uncertainty, such as `dwc:coordinateUncertaintyInMeters`, or an identification's verification status, such as `dwc:identificationVerificationStatus`.
+Confidence in the source is the receiver's judgement, from the copy's provenance and its trust in the owner.
+It is part of the copy's provenance, and is not published as part of the Thing.
+
+See [provisional decision 0025](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0025-provenance-and-authority.md).
 
 ## Threat model
 

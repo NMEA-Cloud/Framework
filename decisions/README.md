@@ -21,6 +21,15 @@ They are the priority for group review.
 | [0014](0014-data-owner-identity.md) | Data owners identified separately from servers |
 | [0015](0015-no-framework-infrastructure.md) | The framework operates no runtime infrastructure |
 | [0016](0016-responsible-parties.md) | Devices roll up to responsible parties |
+| [0017](0017-sightings-organisms-notices.md) | Sightings, organisms and notices as distinct Things |
+| [0019](0019-kinds-of-change.md) | Three kinds of change: create, update and delete |
+| [0020](0020-versions.md) | Versions identified by IRIs of their own |
+| [0021](0021-opaque-iris.md) | IRIs as opaque identifiers |
+| [0022](0022-validity.md) | Validity as a scheduled update |
+| [0023](0023-relationships.md) | Relationships as properties, or Things of their own |
+| [0024](0024-data-integrity-signatures.md) | Persistent signatures as Data Integrity proofs over canonical RDF |
+| [0025](0025-provenance-and-authority.md) | Provenance of Things and of copies, and authority by designation |
+| [0026](0026-rights-and-usage.md) | Usage terms as licenses, by version and by inheritance |
 
 ## All decisions
 
@@ -42,6 +51,16 @@ They are the priority for group review.
 | [0014](0014-data-owner-identity.md) | Data owners identified separately from servers | Provisional |
 | [0015](0015-no-framework-infrastructure.md) | The framework operates no runtime infrastructure | Provisional |
 | [0016](0016-responsible-parties.md) | Devices roll up to responsible parties | Provisional |
+| [0017](0017-sightings-organisms-notices.md) | Sightings, organisms and notices as distinct Things | Provisional |
+| [0018](0018-sighting-asm.md) | Sightings over AIS: a Sighting ASM, and defined text in an Area Notice | Proposed |
+| [0019](0019-kinds-of-change.md) | Three kinds of change: create, update and delete | Provisional |
+| [0020](0020-versions.md) | Versions identified by IRIs of their own | Provisional |
+| [0021](0021-opaque-iris.md) | IRIs as opaque identifiers | Provisional |
+| [0022](0022-validity.md) | Validity as a scheduled update | Provisional |
+| [0023](0023-relationships.md) | Relationships as properties, or Things of their own | Provisional |
+| [0024](0024-data-integrity-signatures.md) | Persistent signatures as Data Integrity proofs over canonical RDF | Provisional |
+| [0025](0025-provenance-and-authority.md) | Provenance of Things and of copies, and authority by designation | Provisional |
+| [0026](0026-rights-and-usage.md) | Usage terms as licenses, by version and by inheritance | Provisional |
 
 ## Statuses
 

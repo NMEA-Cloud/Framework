@@ -57,6 +57,7 @@ Applications of this binding include:
 
 - **Management area alerts.** A shore station alerts a vessel that approaches an official management area and meets the area's criteria, such as size and speed, with an addressed message identifying the area and the regulation that applies (@sec-ais-example-area-alert).
 - **Sightings.** A shore station relays a sighting to vessels nearby (@sec-app-whales).
+- **Notices about sightings.** A shore station relays to vessels nearby a notice that an authority issues about a sighted organism, such as a zone around a whale (@sec-app-whales).
 - **Local alerts.** A station broadcasts a short alert to stations in range.
 
 ## Transport mechanics
@@ -158,20 +159,32 @@ Framework information is carried in AIS messages [@itu-m1371], including:
 
 | Concept | AIS message |
 |:---|:---|
-| Official management area | Area Notice or Geographic Notice ASM |
+| Official management area, announced by a notice | Area Notice or Geographic Notice ASM carrying the notice, with the area's shape; the reference to the management area is not carried |
 | Management area alert | Message 12 with text identifying the area and the regulation; an addressed Area Notice ASM (candidate, to be tested) |
 | Sighting, from shore to ship | Area Notice ASM whose sub-area is a point |
+| Notice about an organism, such as a zone around a sighted whale, from shore to ship | Area Notice or Geographic Notice ASM; the reference to the organism is not carried |
 | Local alert | Message 14 with defined text |
 | Additional information about any of these | Linked Text ASM (candidate) |
+| The IRI of a sighting or notice | Linked Text ASM with the same linkage (proposed, to be tested; @sec-ais-identity) |
 
 : Concepts carried over AIS {#tbl-ais-concepts}
 
 See [provisional decision 0012](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0012-ais-messages-for-concepts.md).
 
+An ASM's name belongs to the transport, not to the concept it carries.
+An Area Notice ASM can carry a sighting or a notice, and a sighting it carries is still a sighting, not a notice (@sec-sightings-organisms).
+Neither is carried over AIS as a Thing.
+What AIS carries are the changes to it (@sec-changes): its creation and its updates, among them a withdrawal, and the expiry scheduled by its duration (@sec-vocab-notices).
+A notice of a management area that moves with an organism is carried with the area the zone covers at the time, and each move is an update (@sec-management-areas).
+See [provisional decision 0017](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0017-sightings-organisms-notices.md).
+
 ::: {.callout-warning title="Open question"}
 Can an Area Notice also carry a sighting from ship to ship or from ship to shore?
+How does a receiver tell whether an Area Notice carries a sighting or a notice: by its point sub-area alone, or also by its description, given that a notice may also be a point?
+What do an Area Notice's start time and duration mean when it carries a sighting?
 What text does message 14 carry for a local alert?
 Which other concepts need AIS messages, and are new ASMs needed for them?
+Should a sighting have an ASM of its own, and a defined text when it is sent in an Area Notice? See [proposed decision 0018](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0018-sighting-asm.md).
 How are IRIs reduced to identifiers small enough for AIS?
 :::
 
@@ -183,6 +196,37 @@ Which concepts and properties survive the mapping; how a receiver knows a Thing 
 
 ::: {.callout-warning title="Open question"}
 What is lost when an AIS message is carried on board in sentences or PGNs rather than received over VHF?
+:::
+
+### Identity of sightings and notices {#sec-ais-identity}
+
+Over AIS, a sighting or a notice is identified by an **alias**: the station that transmits it and its linkage identifier, not its IRI.
+An alias lasts only as long as its linkage identifier, which a station can reuse for later messages.
+One Thing can have several aliases, for example when a network of shore stations transmits one notice from each station.
+It loses its references, such as the organism it concerns: an ASM can say that an area concerns marine mammals, but not which one.
+A sighting also loses what Darwin Core records of it, such as what was seen, how many and by whom.
+
+To make its identity recoverable ([NCF-SEM-013](../overview/semantic-model.qmd#ncf-sem-013)), a sighting or a notice carried over AIS can also carry its IRI,
+for example in a Linked Text ASM with the same linkage.
+A receiver with an IP connection can then retrieve the full Thing, with what AIS does not carry.
+So that a receiver can match the two, the Thing published over IP states every station and linkage identifier it is carried under ([NCF-BND-AIS-001](#ncf-bnd-ais-001)).
+
+A receiver that hears a sighting or a notice over AIS alone, before it knows its IRI, holds it under a local identifier of its own, marked as incomplete ([NCF-SEM-012](../overview/semantic-model.qmd#ncf-sem-012)).
+When it learns the IRI, from a Linked Text or from the Thing published over IP, it identifies the Thing by that IRI from then on,
+and treats every alias linked to that IRI as the same Thing ([NCF-BND-AIS-002](#ncf-bnd-ais-002); for notices, [NCF-VOC-NOT-002](../vocab/notices.qmd#ncf-voc-not-002)).
+
+::: {.callout-warning title="Open question"}
+AIS text is written in six-bit characters, which have no lower-case letters [@itu-m1371].
+How is an IRI written in them: are the IRIs carried over AIS limited to those that lower-casing restores, or are they written some other way?
+How does a receiver tell a Linked Text that carries an IRI from one that carries words?
+Can an Area Notice have more than one Linked Text, one for its words and one for its IRI?
+How long can the IRI be, given the slots a Linked Text can occupy (@tbl-ais-message-sizes)?
+:::
+
+::: {.callout-warning title="Open question"}
+What form does a receiver's local identifier take?
+This depends on how namespaces are decided ([decision 0006](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0006-namespaces.md)).
+How is a Thing marked as incomplete?
 :::
 
 ## Trust {#sec-ais-trust}
@@ -199,7 +243,21 @@ How are private AtoN identifiers assigned to networks of shore stations, especia
 Persistent signatures will not fit in an ASM. See the open question in @sec-trust-security.
 :::
 
+An IRI received over VHF (@sec-ais-identity) is only a claim.
+A receiver that retrieves the Thing it names relies on the trust of the JSON-LD binding (@sec-binding-json-ld),
+and checks that the Thing states the station and linkage identifier it was heard under ([NCF-BND-AIS-001](#ncf-bnd-ais-001)).
+
 ## Requirements
+
+::: {.requirement #ncf-bnd-ais-001}
+**NCF-BND-AIS-001** · *Draft*\
+A sighting or notice published over IP that is also carried over AIS SHOULD state every AIS station and linkage identifier it is carried under.
+:::
+
+::: {.requirement #ncf-bnd-ais-002}
+**NCF-BND-AIS-002** · *Draft*\
+A receiver that learns the IRI of a sighting or notice it holds under an AIS alias MUST identify it by that IRI from then on, and MUST treat every alias linked to that IRI as the same Thing.
+:::
 
 ## Examples
 
@@ -222,5 +280,5 @@ How does the alert identify the regulation that applies?
 ### Whale sighting
 
 ::: {.callout-warning title="To be written"}
-A whale sighting relayed over AIS (@sec-app-whales).
+A whale sighting, and a notice about the whale, relayed over AIS (@sec-app-whales).
 :::

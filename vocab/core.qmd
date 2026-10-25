@@ -18,6 +18,7 @@ The terms, meanings and sources below are candidates and have not been agreed.
 | Person | An individual, for example an observer | schema.org `Person` |
 | Position | A point on the Earth's surface, with accuracy | *To be decided* |
 | Area | A region, for example a management zone | schema.org `GeoShape` — *to be confirmed* |
+| Notice | A Thing an authority issues about an area or other Things (@sec-vocab-notices) | *To be decided* |
 | Time | An instant or interval | ISO 8601 / `xsd:dateTime` |
 
 : Candidate core terms {#tbl-core-terms}
