@@ -29,6 +29,9 @@ Change
 : The creation, update or deletion of a Thing (@sec-changes).
   Withdrawing a Thing is an update, and its expiry a scheduled update.
 
+Change notification
+: A message telling a participant that a Thing has changed: the kind of change and a link to the Thing, with optional hints (@sec-change-notifications).
+
 Class A
 : A shipborne AIS station that meets the IMO carriage requirement for AIS [@itu-m1371].
 

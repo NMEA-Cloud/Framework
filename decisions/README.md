@@ -30,6 +30,8 @@ They are the priority for group review.
 | [0024](0024-data-integrity-signatures.md) | Persistent signatures as Data Integrity proofs over canonical RDF |
 | [0025](0025-provenance-and-authority.md) | Provenance of Things and of copies, and authority by designation |
 | [0026](0026-rights-and-usage.md) | Usage terms as licenses, by version and by inheritance |
+| [0027](0027-notifications-and-change-requests.md) | Change notifications as links, and changes made by request |
+| [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding |
 
 ## All decisions
 
@@ -61,6 +63,8 @@ They are the priority for group review.
 | [0024](0024-data-integrity-signatures.md) | Persistent signatures as Data Integrity proofs over canonical RDF | Provisional |
 | [0025](0025-provenance-and-authority.md) | Provenance of Things and of copies, and authority by designation | Provisional |
 | [0026](0026-rights-and-usage.md) | Usage terms as licenses, by version and by inheritance | Provisional |
+| [0027](0027-notifications-and-change-requests.md) | Change notifications as links, and changes made by request | Provisional |
+| [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding | Provisional |
 
 ## Statuses
 
