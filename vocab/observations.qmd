@@ -29,6 +29,27 @@ A participant that consumes biological observations MUST accept both a single `d
 
 See [provisional decision 0011](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0011-sightings-as-events-and-occurrences.md).
 
+### Sightings and organisms {#sec-sightings-organisms}
+
+A **sighting** is an observation of one or more organisms: an occurrence, or an event containing occurrences.
+An **organism** is a Thing in its own right, identified by an IRI ([NCF-SEM-001](../overview/semantic-model.qmd#ncf-sem-001)) that stays the same from one sighting to the next:
+a particular whale, or a group recorded as one, such as a pod.
+An occurrence refers to the organism it observed with `dwc:organismID`.
+
+A sighting may lead to an update of the organism it observed, such as its last known position or its health.
+The update is made by whoever is responsible for the organism, and gives the sighting as its source (@sec-trust-security).
+
+A notice about an organism, such as an exclusion zone around a whale, is neither the sighting nor the organism.
+It is a Thing produced by an authority, and it may refer to the organism it concerns (@sec-vocab-notices).
+A sighting stays a sighting whatever carries it: over AIS it can travel in an Area Notice ASM (@sec-binding-ais) without becoming a notice.
+
+See [provisional decision 0017](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0017-sightings-organisms-notices.md).
+
+::: {.callout-warning title="Open question"}
+Does every occurrence refer to an organism?
+When the organism is not known, does the observer create one, to be identified later as a known organism?
+:::
+
 ### Terms
 
 | Darwin Core term | Use |
@@ -43,6 +64,7 @@ See [provisional decision 0011](https://github.com/NMEA-Cloud/Framework/blob/mai
 | [`dwc:eventDate`](http://rs.tdwg.org/dwc/terms/eventDate) | When |
 | [`dwc:decimalLatitude`](http://rs.tdwg.org/dwc/terms/decimalLatitude), [`dwc:decimalLongitude`](http://rs.tdwg.org/dwc/terms/decimalLongitude) | Where |
 | [`dwc:basisOfRecord`](http://rs.tdwg.org/dwc/terms/basisOfRecord) | How it was observed — for example by a human or a machine |
+| [`dwc:informationWithheld`](http://rs.tdwg.org/dwc/terms/informationWithheld) | What may be omitted from a disclosure — for example the location of an endangered species (@sec-withheld) |
 | [`dwc:Organism`](http://rs.tdwg.org/dwc/terms/Organism) | A particular organism, or a group recorded as one — for example a pod of orca |
 | [`dwc:organismID`](http://rs.tdwg.org/dwc/terms/organismID) | Identifies an organism or group |
 | [`dwc:ResourceRelationship`](http://rs.tdwg.org/dwc/terms/ResourceRelationship) | A relationship between two records — for example between a calf and its mother |
@@ -55,6 +77,20 @@ See [provisional decision 0011](https://github.com/NMEA-Cloud/Framework/blob/mai
 ::: {.callout-note title="Position"}
 Darwin Core gives a position as `dwc:decimalLatitude` and `dwc:decimalLongitude`.
 Alternatives are the common representation of position in the semantic model (@sec-semantic-model), for which candidates include GeoJSON [@rfc7946] and JSON-FG [@ogc-json-fg].
+:::
+
+### Withheld information {#sec-withheld}
+
+Some observations are sensitive, such as the location of an endangered species (@sec-threat-privacy).
+Rather than make them less specific, their owner seals the sensitive parts within the observation, and gives the keys to those with a need to know (@sec-sealed).
+Observers can also report through an intermediary, such as a sighting network, which publishes sightings of its own derived from their reports (@sec-intermediaries).
+
+An owner that omits statements instead, by selective disclosure, says what may be omitted in `dwc:informationWithheld`, in a statement that every disclosure includes,
+so that a receiver can tell a statement that was omitted from one that is missing.
+
+::: {.requirement #ncf-voc-obs-002}
+**NCF-VOC-OBS-002** · *Draft*\
+An observation from which statements may be omitted SHOULD state what may be omitted with `dwc:informationWithheld`, in a statement that every disclosure of it includes.
 :::
 
 ### Groups of organisms
@@ -96,13 +132,14 @@ A sighting of an orca pod of five adult females with two calves: one event conta
 ::: {.callout-warning title="Open question"}
 Which controlled vocabularies are used for `dwc:sex` and `dwc:lifeStage`?
 Darwin Core recommends one for each but does not prescribe it, and its examples do not include cetacean life stages such as *calf*.
+Its IRI-valued `dwciri:sex` and `dwciri:lifeStage` terms would carry a term from such a vocabulary.
 :::
 
-::: {.callout-warning title="Open question"}
 [NCF-SEM-003](../overview/semantic-model.qmd#ncf-sem-003) requires the from, to and type of a relationship to be IRIs,
-but Darwin Core allows plain identifiers and a free-text relationship type.
-How are Darwin Core relationships carried without breaking that requirement?
-:::
+but terms in Darwin Core's `dwc:` namespace hold text, including identifiers such as `dwc:eventID` and `dwc:organismID`, which have no IRI-valued form.
+Where Darwin Core has an IRI-valued term in its `dwciri:` namespace, such as `dwciri:recordedBy`, the framework uses it.
+Where it has none, a Thing carries the identifier twice: as text in the `dwc:` term, for Darwin Core tools, and as an IRI in a framework property, which makes the link (@sec-relationships).
+See [provisional decision 0023](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0023-relationships.md).
 
 ::: {.callout-warning title="Open question"}
 How does a constrained transport such as AIS or NMEA 2000 carry an event with several occurrences,
@@ -112,9 +149,10 @@ or tell the receiver that the breakdown has been lost ([NCF-SEM-012](../overview
 ## Hazards and conditions
 
 ::: {.callout-warning title="To be written"}
-Floating debris, fishing gear and other temporary obstructions; shoaling and changing waterway conditions;
-protected areas and management zones. Identify existing vocabularies to reuse. Make sure this covers hazard
+Floating debris, fishing gear and other temporary obstructions; shoaling and changing waterway conditions.
+Identify existing vocabularies to reuse. Make sure this covers hazard
 types defined in AIS Area Notice and Geographic Notice ASMs.
+Protected areas and management zones are Things of their own, to which notices refer (@sec-management-areas).
 :::
 
 ## Confirmation and feedback

@@ -20,8 +20,17 @@ This binding is how framework information reaches current-generation displays, a
 
 ### NMEA 2000
 
+#### Getting current state
+
+A participant can ask a device to transmit a PGN, as NMEA 2000 provides.
+
+#### Receiving changes
+
+PGNs arrive as devices transmit them, unsolicited or on request.
+Each PGN is the change itself, not a link to the Thing that changed (@sec-change-notifications).
+
 ::: {.callout-warning title="To be written"}
-Getting current state; receiving changes; addressing and routing; constraints.
+Addressing and routing; constraints.
 :::
 
 ### OneNet
@@ -33,6 +42,16 @@ Getting current state; receiving changes; addressing and routing; constraints.
 ## Representation
 
 PGNs that carry AIS messages are a transport of the AIS binding (@sec-binding-ais), not part of this representation.
+Synthesizing such PGNs on board, rather than relaying what the vessel received, is discussed in @sec-ais-on-board.
+
+### Identity and changes
+
+On NMEA 2000 a device is known by two aliases (@sec-ais-identity), neither of them an identity:
+its source address, which lasts only until addresses are next claimed, and the NAME with which it claims its address, which lasts longer but can change.
+A device heard on the vessel's network is a Thing whose IRI the vessel assigns, as the authority for its own network; the IRI is opaque ([NCF-SEM-004](../overview/semantic-model.qmd#ncf-sem-004)) and does not encode the NAME.
+
+A PGN that carries a reading is an update to the Thing that holds it, even when the value is unchanged, since it renews the value's validity (@sec-validity).
+NMEA 2000 does not say how long a value holds, so the binding derives a value's validity from the interval at which the device transmits it.
 
 ::: {.callout-warning title="Open question"}
 Which existing PGNs can carry framework concepts, and are new PGNs needed?
@@ -41,11 +60,20 @@ How does vessel data on the bus map to the vessel data vocabulary (@sec-vocab-ve
 
 ## Fidelity
 
+A PGN carries a value, but not the IRI of the Thing it belongs to, its references, its version, a signature, usage terms, or provenance beyond the device's source address and NAME.
+A Thing held from PGNs alone is therefore incomplete ([NCF-SEM-012](../overview/semantic-model.qmd#ncf-sem-012)).
+PGNs also fix the units and resolution of what they carry, as NMEA 2000 defines them.
+
 ::: {.callout-warning title="Open question"}
 What is the maximum message size on OneNet, and can a OneNet message carry what an NMEA 2000 message cannot, such as full identifiers?
 :::
 
 ## Trust
+
+NMEA 2000 messages are not authenticated: trust in them comes from physical access to the vessel's own network.
+The vessel's gateway is the origin of the Things it makes from PGNs (@sec-origins), and signs them as the vessel (@sec-trust-security).
+The PGNs themselves are not Things: each one's PGN, source address and NAME are recorded in the provenance of what the gateway makes from it (@sec-provenance).
+See [provisional decision 0030](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0030-on-board-bindings.md).
 
 ::: {.callout-warning title="Open question"}
 Can a OneNet message carry a persistent signature (@sec-trust-security)?

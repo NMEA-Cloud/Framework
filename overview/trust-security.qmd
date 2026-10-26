@@ -25,14 +25,48 @@ The two can be combined. Persistent signatures allow trust to be maintained as i
 It MUST be possible to attach a persistent signature to any Thing.
 :::
 
-The working proposal is to use JOSE: JWS [@rfc7515] for signatures and JWE [@rfc7516] for encryption,
-applied to the JSON-LD representation, with identifiers for the algorithms used.
-See [decision record 0004](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0004-trust-stack.md).
+A persistent signature is a W3C Data Integrity proof [@vc-data-integrity], embedded in the Thing's representation and made over the canonical form of its RDF dataset [@rdf-canon],
+with a cryptosuite such as `eddsa-rdfc-2022` [@vc-di-eddsa] or `ecdsa-rdfc-2019` [@vc-di-ecdsa].
+Because it signs the RDF rather than the bytes, one signature verifies the Thing in any representation that maps to that RDF, JSON-LD with any context or CBOR-LD, and survives re-serialization by caches and relays.
+JWE [@rfc7516] remains the working proposal for encryption.
+See [decision record 0004](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0004-trust-stack.md) and [provisional decision 0024](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0024-data-integrity-signatures.md).
+
+A signature covers one version of a Thing (@sec-versions): its state, including the Thing's IRI, the version's IRI and the versions it succeeds.
+The proof is not part of the version: a Data Integrity proof covers the Thing without its proofs, together with the proof's own options, so adding a signature, such as the second party's to a contractual relationship (@sec-relationships), makes no new version.
+Several signers each add a proof of their own, forming a proof set.
+The owner of a Thing can sign in advance the version that a scheduled change produces ([NCF-SEM-042](semantic-model.qmd#ncf-sem-042)), and the scheduled change carries that proof, so that a cached representation that applies the change holds a version its owner signed (@sec-changes).
+
+::: {.requirement #ncf-tru-002}
+**NCF-TRU-002** · *Draft*\
+A persistent signature MUST be a Data Integrity proof over the canonical RDF dataset of one version of a Thing.
+:::
+
+Canonicalizing a dataset is cheap when it has no blank nodes, since it then amounts to sorting its statements; blank nodes can make it costly.
+A Thing that is signed therefore gives every node an IRI, or holds structured values as JSON literals.
+
+::: {.requirement #ncf-tru-003}
+**NCF-TRU-003** · *Draft*\
+A Thing that is persistently signed SHOULD contain no blank nodes.
+:::
+
+A participant that relays a Thing does not sign it.
+A relay that needs to add an assurance of its own wraps the Thing in a Thing of its own, which it signs, and which is treated as derived from the Thing it wraps (@sec-provenance).
+
+::: {.requirement #ncf-tru-004}
+**NCF-TRU-004** · *Draft*\
+A participant that relays a Thing MUST NOT add a proof of its own to the Thing.
+:::
+
+::: {.callout-warning title="Open question"}
+How does a Data Integrity proof's verification method relate to a data owner's certificate (@sec-data-owners)?
+Which cryptosuites must a receiver support, given what constrained devices can compute?
+How does a scheduled change carry the proof of the version it produces?
+:::
 
 Some transports, such as AIS or NMEA 2000, may not have sufficient bandwidth to accommodate signatures or other message authentication tags.
 The mechanism used to establish trust must be defined by each binding.
 
-## Identity and authorization
+## Identity and authorization {#sec-identity-authorization}
 
 The working proposal:
 
@@ -110,13 +144,13 @@ For example, data from a device on a chartered vessel can trace to:
 - a crew member.
 
 Each link from a device to a responsible party is a relationship (@sec-relationships), so it can be signed, versioned and exchanged like any other Thing.
+Relationships change over time, for example with each charter: a relationship's period is its validity, and its earlier versions tell a receiver which responsible parties applied when data was produced (@sec-relationships).
+A link to a responsible party is contractual: it holds only when the device's owner and the responsible party have both signed it ([NCF-SEM-006](semantic-model.qmd#ncf-sem-006)), so that no one can make a party responsible for data without its agreement.
 
 See [provisional decision 0016](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0016-responsible-parties.md).
 
 ::: {.callout-warning title="Open question"}
 Which roles of responsible parties need terms in the vocabularies?
-Relationships change over time, for example with each charter: how is the period of a relationship recorded, so that a receiver can tell which responsible parties applied when data was produced?
-Who may assert a relationship between a device and a responsible party, and does the responsible party have to confirm it?
 Does a device sign data itself, or does a responsible party sign for it?
 :::
 
@@ -124,16 +158,348 @@ Does a device sign data itself, or does a responsible party sign for it?
 Identity of vessels and on-board devices; role of official identifiers like MMSI alongside smaller vessels and mobile applications.
 :::
 
-## Provenance and authority
+## Provenance and authority {#sec-provenance}
 
-::: {.callout-warning title="To be written"}
-How the framework records who originated a piece of information, who relayed or transformed it, and on whose authority.
-How authoritative sources are distinguished from other contributors, and how confidence is expressed.
+Provenance is described with the W3C PROV Ontology [@prov-o]: for example, `prov:wasAttributedTo` for the agent that made a Thing, `prov:wasDerivedFrom` for the Things it was derived from,
+and `prov:actedOnBehalfOf` for a device acting for a responsible party (@sec-responsible-parties).
+
+A Thing's provenance is of two kinds:
+
+The Thing's own
+: Who made it, what it was derived from, and on whose behalf.
+  Its owner states this as part of the Thing, and signs it with the Thing.
+
+The copy's
+: How a particular copy reached a participant: over which transport and through which relays, when it was received, whether its signature verified and under which tier (@sec-data-owners), whether it is complete, and whether a scheduled change was applied to it by an unsynchronized clock (@sec-changes).
+  The participant that holds the copy records this.
+  It is not part of the Thing, and is not published as a change to it ([NCF-SEM-035](semantic-model.qmd#ncf-sem-035)), though the participant may publish it as a Thing of its own.
+
+A relay neither signs nor changes a Thing it relays ([NCF-TRU-004](#ncf-tru-004)), so the relays a Thing passed through belong to the provenance of each copy:
+for example, a notice heard over AIS from a base station by a vessel's AIS receiver, and passed on over NMEA 2000.
+A relay that wraps a Thing makes a Thing of its own, derived from the Thing it wraps.
+
+A Thing derived from others names each by the IRI of the version it used (@sec-versions), so that the derivation can be checked against exactly what it was made from, even after those Things change.
+For example, an organism's last known place names the version of the sighting it was derived from.
+
+::: {.requirement #ncf-tru-005}
+**NCF-TRU-005** · *Draft*\
+A Thing that states what it was derived from MUST name each input by the IRI of the version it used.
 :::
 
-## Threat model
+A derivation that would disclose its sources can be sealed, so that it is shown only to those with a need to know (@sec-intermediaries).
 
-::: {.callout-warning title="To be written"}
-Assets, threat actors and threats (spoofed hazards, suppressed warnings, replay of stale information, compromised sources, privacy of vessel data),
-and which mechanisms in this chapter address each.
+### Authority
+
+Anyone can issue a notice (@sec-vocab-notices), and any participant can claim to be authoritative, so authority is not something a source claims for itself.
+It is conferred by a **designation**: a relationship (@sec-relationships), a Thing of its own, in which one party names another as authoritative for a kind of information in an area,
+such as a national maritime administration designating a wildlife agency for the management areas in its waters.
+A designation is signed by the party that makes it.
+A receiver chooses the parties it trusts directly, as it chooses the first tier's trust list of data owners (@sec-data-owners), and treats any other source as authoritative only through a chain of designations from one of them.
+A source without a designation is a contributor (@sec-architecture).
+
+::: {.requirement #ncf-tru-006}
+**NCF-TRU-006** · *Draft*\
+A receiver MUST treat a source as authoritative only if the receiver trusts the source directly, or a chain of designations from a party it trusts names the source as authoritative.
+:::
+
+::: {.callout-warning title="Open question"}
+Must the designated party also sign a designation, making it a contractual relationship ([NCF-SEM-006](semantic-model.qmd#ncf-sem-006))?
+May a designated party designate others in turn, and how long may a chain of designations be?
+In what terms does a designation name a kind of information and an area?
+:::
+
+### Confidence
+
+Confidence is of two kinds, as provenance is.
+Confidence in the content is the owner's to state, in the terms of each vocabulary: a position's uncertainty, such as `dwc:coordinateUncertaintyInMeters`, or an identification's verification status, such as `dwc:identificationVerificationStatus`.
+Confidence in the source is the receiver's judgment, from the copy's provenance and its trust in the owner.
+It is part of the copy's provenance, and is not published as part of the Thing.
+
+See [provisional decision 0025](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0025-provenance-and-authority.md).
+
+### Distrust statements {#sec-distrust}
+
+Any participant can publish a **distrust statement**: a Thing of its own saying that a receiver should not rely on other Things, on some of their versions, or on what a source made over a period.
+What it means depends on who makes it:
+
+The owner of the data
+: The statement is the owner's revocation of its own data, for example after a device or a key is compromised.
+
+Another party
+: The statement is either an audit, a finding that the data is wrong, or a denial of information, an attempt to keep receivers from information they need.
+
+A distrust statement does not of itself make data untrusted.
+A receiver decides whether to rely on it as on any other Thing, by its trust in the party that made it (@sec-provenance), and so tells an audit from a denial of information.
+
+::: {.callout-warning title="Open question"}
+Which terms express a distrust statement, and how does it name a range of versions or a period?
+How does an owner whose key is compromised sign a distrust statement that receivers can trust, and how does this relate to the revocation of its certificate (@sec-data-owners)?
+:::
+
+See [provisional decision 0031](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0031-threat-model.md).
+
+## Threat model {#sec-threat-model}
+
+This section names what the framework protects and from whom, the mechanisms in this chapter and in the bindings that answer each threat, and what they leave open.
+See [provisional decision 0031](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0031-threat-model.md).
+
+### Assets
+
+- Safety information, such as notices and hazards (@sec-vocab-notices), and its timely delivery.
+- The state and identity of vessels.
+- Observations, such as sightings (@sec-vocab-observations).
+- The keys and identities of data owners (@sec-data-owners).
+- The integrity and availability of a vessel's own networks, and of the systems on them.
+- Personal data, such as that of responsible parties, for example crew and charterers (@sec-responsible-parties), and of observers.
+- The locations of sensitive wildlife.
+
+### Threat actors
+
+- Any participant over IP, since anyone can publish (@sec-architecture).
+- Anyone with an AIS transmitter.
+- A compromised device, gateway, server or key.
+- A relay or cache that withholds, delays or replays what it carries.
+- Those who collect data about vessels or people, for surveillance, theft or piracy.
+- Those who seek the locations of sensitive wildlife, to harass or hunt it.
+
+### Out of scope
+
+Physical jamming of VHF or GNSS, and denial of service against internet services by sheer volume, need mitigations outside the framework, and are not addressed here.
+Amplification and query storms that the framework's own mechanisms could cause are in scope (@sec-threat-dos).
+
+### Spoofing {#sec-threat-spoofing}
+
+Spoofed information includes a false hazard or notice, a false sighting, a false position or identity of a vessel, and a false position or time from spoofed GNSS.
+
+Over IP, a persistent signature shows who made a Thing ([NCF-TRU-002](#ncf-tru-002)), and a chain of designations shows whether that party is authoritative ([NCF-TRU-006](#ncf-tru-006)).
+A forged Thing either fails to verify, or verifies as coming from a party that is not authoritative for it.
+
+Over VHF, trust comes from regulation (@sec-ais-trust), which deters spoofing but does not prevent it: anyone with a transmitter can send a message under any identifier.
+A receiver that holds the owner's version of a Thing marks a change to it heard only over AIS as unconfirmed ([NCF-BND-AIS-005](../bindings/ais.qmd#ncf-bnd-ais-005)).
+Information received over AIS may be spoofed, and mariners are reminded to use it with due caution.
+
+On board, NMEA 0183 and NMEA 2000 are not authenticated (@sec-threat-injection).
+
+Spoofed GNSS can shift a receiver's position and its clock.
+A receiver whose clock is wrong applies scheduled changes at the wrong time (@sec-changes): it may end a warning early, or keep one in force too long.
+It records in its copy's provenance when it applied a scheduled change without a synchronized clock (@sec-provenance), but it cannot always tell that a clock which seems synchronized has been spoofed.
+
+Acting automatically on information, such as changing a vessel's course or speed, turns a successful spoof into a hazard.
+
+::: {.requirement #ncf-tru-007}
+**NCF-TRU-007** · *Draft*\
+A receiver SHOULD NOT act automatically on information that it cannot attribute to a source it treats as authoritative.
+:::
+
+### Suppression {#sec-threat-suppression}
+
+A warning can be suppressed: a relay or cache withholds it, a notification is lost, or a link is down.
+A receiver can tell that it has missed a change to a Thing it holds, but not that it has missed a Thing it never heard of.
+
+A receiver that may have missed notifications fetches the Things it holds again (@sec-change-notifications), and a cached representation's freshness ends by the next scheduled change ([NCF-BND-JSONLD-007](../bindings/json-ld.qmd#ncf-bnd-jsonld-007)).
+A receiver that can reach an origin by more than one route is harder to cut off.
+
+An authority closes the remaining gap by publishing its current notices, those not expired or withdrawn, as a collection: a Thing of its own, which it signs, with a new version whenever a notice is issued, withdrawn or expires.
+A receiver whose copy of the collection is fresh knows that it holds every current notice, and the collection's freshness bounds how long a suppressed notice can go unnoticed.
+The DNS Security Extensions (DNSSEC) answer the same threat for the DNS: a zone's signed records chain its names in order, so that a resolver can verify that a name does not exist, and each signature's validity period bounds how long an old answer can be replayed [@rfc4033; @rfc7129].
+How a collection is identified and referred to is still open (@sec-semantic-model).
+
+::: {.requirement #ncf-tru-008}
+**NCF-TRU-008** · *Draft*\
+An authority SHOULD publish its current notices as a collection, a Thing with versions of its own.
+:::
+
+A receiver shows how fresh its information is, so that silence is not taken for an all-clear.
+A distrust statement from a party that is not trusted can also be an attempt at suppression (@sec-distrust).
+
+### Replay {#sec-threat-replay}
+
+Over IP, a replayed version still verifies, since its signature is valid.
+Its validity is signed with it, so a version that has expired stays expired.
+A receiver keeps the newer of two versions ([NCF-SEM-044](semantic-model.qmd#ncf-sem-044)), so an older version replayed to it cannot take the place of one that succeeds it.
+A receiver that never held the newer version accepts the older one until its copy stops being fresh and it fetches the Thing again from its origin.
+
+Over AIS, a recording of a notice that has expired, transmitted again under the same station and linkage identifier, is a new Thing to a receiver ([NCF-BND-AIS-004](../bindings/ais.qmd#ncf-bnd-ais-004)).
+The Area Notice and Geographic Notice carry a notice's start time without its year, which the receiver takes from its own date [@asm-366-22; @asm-367-22], so a recording played back a year later can appear current.
+Trust over AIS rests on regulation for replay as for spoofing, and the framework accepts that: a rule to tell a replay from a reissue would fail on cases such as these.
+
+### Compromised sources {#sec-threat-compromise}
+
+A compromised device, gateway, server or key makes information that verifies as its owner's.
+On board, a compromised gateway signs whatever it is given as the vessel (@sec-binding-pgns).
+
+Each Thing that states what it was derived from names the versions it used ([NCF-TRU-005](#ncf-tru-005)), so a receiver can find what was derived from a source once it knows the source was compromised.
+The owner, or anyone else, can publish a distrust statement saying which data not to rely on (@sec-distrust).
+The party that made a designation can end it, so that its designated source is no longer authoritative.
+How a receiver learns that a certificate has been revoked is still open (@sec-data-owners).
+
+### Injection on board {#sec-threat-injection}
+
+NMEA 0183 and NMEA 2000 networks are not authenticated: a device connected to one can send any message, under any address or talker, and the systems on the network act on what they receive.
+Trust in them rests on physical access to the vessel's own network (@sec-binding-sentences; @sec-binding-pgns).
+A gateway that passes information from outside onto them, a device with a wireless interface, or a compromised device can inject messages that the vessel's systems act on.
+Since existing on-board systems must keep working (@sec-architecture), this is the framework's concern wherever a gateway puts information on the vessel's networks, including when it relays or synthesizes AIS messages (@sec-ais-on-board).
+
+Some vessel networks are moving toward zero trust architectures, in which no device is trusted because of where it is on the network, and each request is authenticated and authorized [@nist-sp800-207].
+Most vessels' networks are not there yet.
+
+### Amplification and query storms {#sec-threat-dos}
+
+Amplification
+: A small request that causes a large response, sent with a forged source address over UDP, as CoAP can be [@rfc7252]; or a subscription whose notifications fan out to many subscribers.
+
+Query storms
+: A change notification, real or forged, or a broadcast heard over AIS by many receivers, prompts every receiver to fetch the Thing at once.
+
+The mitigations common to applications reachable from the internet apply:
+
+- authorization of subscriptions and requests (@sec-identity-authorization), so that only known clients can cause work;
+- rate limits;
+- over UDP, responses to an unauthenticated source no larger than its request;
+- caches, which a Thing's freshness lets serve fetches in place of its origin (@sec-binding-json-ld);
+- receivers that spread their fetches after a notification over a random delay.
+
+### Privacy {#sec-threat-privacy}
+
+Every disclosure opens information to correlation and inference.
+The framework can limit what a participant discloses and to whom, but not what a receiver infers from it, alone or with other data.
+
+Authenticity and privacy pull against each other.
+A persistent signature is evidence that its signer made a Thing, wherever the Thing goes, and the provenance that makes information trustworthy also records who made it, where and when.
+A signed position is a record of where a vessel was, which its owner cannot later deny.
+
+Removing names does not make data anonymous.
+In one study of mobile phone locations, four points in place and time were enough to identify 95% of one and a half million people, and coarsening the data helped little [@de-montjoye-2013].
+A vessel's track, a sighting's place and time, or the observations of one observer can be correlated with other data, AIS among it, to identify the vessel or the person.
+Withholding part of a Thing does not protect it either if the rest gives it away: a sighting's location can follow from its time, its observer and the track of the observer's vessel.
+Anything carried over AIS is broadcast to everyone in range.
+
+A collection discloses its members.
+An authority's collection of current notices ([NCF-TRU-008](#ncf-tru-008)) lists every current notice, which suits public notices but not Things whose existence should not be disclosed.
+DNSSEC meets the same trade-off: its signed chain of names lets anyone list every name in a zone, and hashing the names makes that harder [@rfc5155].
+
+#### Sealed parts {#sec-sealed}
+
+A part of a Thing that is not for every receiver is **sealed**: encrypted within the Thing [@rfc7516] and held as a JSON literal, so that every copy holds the whole Thing, and only those given the key can read the sealed part.
+The Thing's persistent signature covers the sealed part in its encrypted form, so it verifies without the key.
+A sealed copy is therefore complete ([NCF-SEM-012](semantic-model.qmd#ncf-sem-012)) though not wholly readable, and it is sealed against modification: unsealing it yields exactly what the owner sealed.
+Every receiver holds the same version, so caches and relays carry it as they carry any other (@sec-origins).
+The sealed part is its own placeholder: a receiver can tell information that was sealed from information that is missing.
+Whether a sealed part shows the property it holds, such as a location, or is one value that says only that something is sealed, is the owner's choice: the first is more useful to a receiver, and the second discloses less.
+
+::: {.requirement #ncf-tru-010}
+**NCF-TRU-010** · *Draft*\
+A part of a Thing that is not disclosed to every receiver SHOULD be sealed within the Thing rather than omitted from it.
+:::
+
+An owner may seal any of a Thing's **content**: whatever its vocabularies say about it, its provenance included.
+It never seals the Thing's **envelope**, what the framework itself reads to handle the Thing, so that every receiver can identify, order, expire, use and verify it without a key:
+
+- its IRI and its type;
+- its version and the versions it succeeds (@sec-versions);
+- its validity and its scheduled changes (@sec-changes);
+- its usage terms (@sec-rights);
+- its proofs, and the protected headers of its sealed parts.
+
+The type in the envelope says what kind of Thing it is, such as a sighting or a notice; a finer kind, such as the species seen, is content.
+
+::: {.requirement #ncf-tru-014}
+**NCF-TRU-014** · *Draft*\
+An owner MUST NOT seal any part of a Thing's envelope: its IRI, its type, its version and the versions it succeeds, its validity, its scheduled changes, its usage terms, its proofs, or the protected headers of its sealed parts.
+:::
+
+A receiver is given the key when it shows a need to know, before or after it receives the copy, under the authorization policy of whoever holds the key (@sec-identity-authorization).
+A key once given cannot be taken back.
+The owner relies on those it gives a key to to keep private what the key unseals, which is a matter of its trust in them.
+A key that unseals one part of one version, and nothing else, discloses no more than that part when it is given, so keys are best used once.
+
+::: {.requirement #ncf-tru-011}
+**NCF-TRU-011** · *Draft*\
+A key that unseals part of a Thing SHOULD unseal that part of that version alone.
+:::
+
+A sealed part is encrypted with a single-use **content key**, used directly, with the `dir` algorithm [@rfc7518], so that it can be sealed before anyone knows who its readers will be.
+Its protected header names the content key by `kid`, whose structure JOSE leaves to the application [@rfc7515]: here, the IRI of a Thing that holds the key as a JWK [@rfc7517].
+The header is covered by the encryption and, with the sealed part, by the Thing's signature.
+
+::: {.requirement #ncf-tru-012}
+**NCF-TRU-012** · *Draft*\
+A sealed part MUST be encrypted directly with a content key, and MUST name that key in its protected header by `kid`, as the IRI of the Thing that holds it.
+:::
+
+The key's Thing is a Thing like any other, with an opaque IRI ([NCF-SEM-004](semantic-model.qmd#ncf-sem-004)) and an authorization policy of its own.
+A receiver retrieves it as it retrieves any Thing, and is given it only if the policy allows; being given it is how a receiver shows its need to know.
+Each time it is given, the key is encrypted to the receiver's own public key, as an encrypted JWK [@rfc7517], so that only that receiver can read it however it travels.
+Caches and relays can therefore carry a key on its way to a receiver, and an owner can send it ahead of time to a receiver that will be out of contact.
+The key's own record of who it was given to is the record of who can read the part it seals.
+
+::: {.requirement #ncf-tru-013}
+**NCF-TRU-013** · *Draft*\
+A content key MUST be given to a receiver only as a JWE encrypted to that receiver's public key.
+:::
+
+A receiver that is given keys has a key pair for encryption, which it keeps apart from any key it signs with.
+It can give the public key in its request for a content key, and then needs no certificate for encryption.
+It can use a fresh key pair for each request, so that a key pair compromised later discloses only the keys sent to it.
+
+A public key given in a request is only as safe as the authorization it is sent with: anyone who steals a bearer token could send a public key of its own, and be given the content key.
+A request that gives a public key is therefore made with an access token bound to the client, by DPoP [@rfc9449] or by mutual TLS [@rfc8705], so that a stolen token is not enough.
+It also reaches the key's holder unaltered: directly over TLS, or signed by the client when it travels through a relay, so that no relay can put its own public key in place of the client's.
+A key sent ahead of time, without a request, is encrypted to a public key the receiver has published or that its certificate holds.
+
+::: {.requirement #ncf-tru-015}
+**NCF-TRU-015** · *Draft*\
+A request for a content key that gives the public key to encrypt it to MUST be made with an access token bound to the client, and MUST be signed by the client unless it travels directly to the key's holder over TLS.
+:::
+
+Since every copy holds the sealed part, a key that leaks, or a cipher that is later broken, unseals every copy at once, and the size of a sealed part can itself disclose something.
+
+Applications keep information from receivers by sealing it, rather than by making it less specific.
+A Thing can also be disclosed by omission, signed with a cryptosuite that supports **selective disclosure**, such as `ecdsa-sd-2023` [@vc-di-ecdsa], so that a holder can reveal some of its statements and the signature still verifies them.
+An omitted statement leaves no trace, so a Thing from which statements may be omitted says so in a statement that every disclosure includes; for observations, this is `dwc:informationWithheld` (@sec-withheld).
+A holder that reveals part of a Thing derives a proof from the owner's, which is not a proof of the holder's own ([NCF-TRU-004](#ncf-tru-004)).
+A disclosure that differs by receiver is not served to other receivers from a shared cache, and an HTTP shared cache does not store a response to a request that carries authorization unless the response allows it [@rfc9111].
+
+#### Intermediaries {#sec-intermediaries}
+
+An **intermediary** stands between the sources of information and its receivers.
+Sources report information to it, and disclose their identity to it alone.
+It derives Things from what they report, attributed to itself rather than to its sources, owns them under its contribution policy (@sec-requesting-changes), and publishes them to receivers.
+Receivers trust the intermediary, through a designation where it is authoritative (@sec-provenance), and need not know who its sources are.
+It states what each Thing was derived from ([NCF-TRU-005](#ncf-tru-005)) in a sealed part, so that it can prove the derivation and its sources to those with a need to know, such as an auditor, which normal operation does not need.
+
+For example, observers report sightings to a sighting network, which publishes sightings of its own; vessels report hazards to a service, which publishes notices of them.
+A vessel's shadow can act as an intermediary for its vessel (@sec-architecture).
+
+#### Identifiers
+
+A party can be referred to in layers: by a token that means something only within one exchange, by an opaque identifier, or by its name or an official identifier such as an MMSI.
+Each resolves to the next only for those whose need to know the holder's authorization policy allows (@sec-identity-authorization).
+An IRI is opaque to applications ([NCF-SEM-004](semantic-model.qmd#ncf-sem-004)) but not to people: an IRI that contains a vessel's name discloses it to anyone who sees it.
+
+::: {.requirement #ncf-tru-009}
+**NCF-TRU-009** · *Draft*\
+A participant SHOULD refer to a person, organization or vessel by an opaque identifier wherever disclosing who it is is not required.
+:::
+
+#### Situational disclosure
+
+What a participant discloses depends on the situation.
+A vessel may keep its position private in normal operation, disclose it to vessels nearby when there is a risk of collision, and disclose it to everyone when it declares an emergency and wants help.
+Who may read a Thing is set by policy (@sec-identity-authorization), so widening it, or giving a key, is not a change to the Thing and makes no new version (@sec-changes).
+Vessels nearby are an audience defined by where they are rather than by who they are, which a local broadcast, such as over VHF, reaches.
+Disclosure cannot be undone: a position disclosed in an emergency stays disclosed.
+Disclosing a position in an emergency adds to distress alerting and does not replace it (@sec-architecture).
+
+A vessel that a jurisdiction requires to transmit its position over AIS discloses it there, whatever it keeps private elsewhere.
+
+#### Data protection law
+
+Data protection law applies to personal data in many jurisdictions, and differs between them.
+A vessel may be subject at once to the law of its flag state, of the coastal state in whose waters it is, and of the states where its crew, owners and observers live or where shore services hold its data, and these change as it voyages.
+
+::: {.callout-warning title="Open question"}
+How does a receiver publish the public key that keys sent ahead of time are encrypted to: in its certificate, or in a key set at its IRI?
+Which terms describe a sealed part, and which content encryption and key management algorithms must a receiver support?
+Which terms mark omitted information in vocabularies other than observations?
 :::

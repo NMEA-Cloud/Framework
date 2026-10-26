@@ -3,7 +3,7 @@
 [Informative]{.status}
 
 Part I defines *how* information is described. This part defines *what* it is described with:
-the classes and properties for vessels, observations, vessel data and everything else the framework carries.
+the classes and properties for vessels, observations, notices, vessel data and everything else the framework carries.
 
 Vocabularies are organized as **modules**, one per domain, so that a new domain can be added
 — or an existing one extended — without changing the framework itself.

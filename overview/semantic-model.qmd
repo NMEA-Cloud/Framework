@@ -38,6 +38,19 @@ A Thing's identifier MUST NOT change when the Thing is updated or when it is car
 
 To ensure long term stability of identifiers, authorities should consider use of a persistent redirect service such as `w3id.org`.
 
+An IRI is an opaque identifier [@webarch].
+What a Thing is, who owns it, and which version of it a representation carries are stated in its representation, not read from its IRI.
+An owner allocates IRIs as it chooses, and a path such as `/notices/` or `/versions/7` is a convenience of its own, with no meaning to anyone else.
+Nor is a Thing's owner the holder of its IRI's domain, as an IRI under a redirect service such as `w3id.org` shows: the owner is stated in the Thing, and proved by its signature (@sec-data-owners).
+An IRI's authority still has two roles, neither of them a meaning of the Thing: it locates the server from which the Thing is retrieved, as the IRI's scheme defines, and it divides identifiers among naming authorities (see Namespaces, below).
+
+::: {.requirement #ncf-sem-004}
+**NCF-SEM-004** · *Draft*\
+An application MUST NOT infer anything about a Thing from the components of its IRI, such as its authority or its path, beyond what the IRI's scheme defines for retrieving it.
+:::
+
+See [provisional decision 0021](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0021-opaque-iris.md).
+
 ### Namespaces
 
 The primary namespacing mechanism is the authority component of resource IRIs. 
@@ -50,7 +63,7 @@ The primary namespacing mechanism is the authority component of resource IRIs.
 ## Relationships {#sec-relationships}
 
 Everything is connected.
-A relationship is itself a Thing, with at least a **from**, a **to** and a **type** —
+A relationship has at least a **from**, a **to** and a **type** —
 for example *this observation* — *was made by* — *this vessel*.
 
 ::: {.requirement #ncf-sem-003}
@@ -58,7 +71,35 @@ for example *this observation* — *was made by* — *this vessel*.
 A relationship MUST identify the Thing it is from, the Thing it is to, and its type, each by IRI.
 :::
 
-Because relationships are Things, they can be signed, versioned and exchanged like anything else.
+Usually a relationship is a property of the Thing it is from: the property is its type, and its value the IRI of the Thing it is to.
+It is then part of that Thing, stated by the Thing's owner and changed only by its origin, with the Thing's versions (@sec-origins).
+
+A relationship with properties of its own is a Thing of its own: one with an owner other than the owner of the Thing it is from, a period during which it holds, or a signature of its own.
+A charter, a crew member's service on a voyage, and a device's link to a responsible party (@sec-responsible-parties) are relationships of this kind.
+Its owner, who may be neither of the Things it relates, such as a registry, states it.
+Its period is its validity (@sec-validity), and its earlier versions (@sec-versions) tell a receiver which relationships held when data was produced.
+Because such relationships are Things, they can be signed, versioned and exchanged like anything else.
+
+::: {.requirement #ncf-sem-005}
+**NCF-SEM-005** · *Draft*\
+A relationship that has an owner, a period or a signature of its own SHOULD be a Thing of its own.
+:::
+
+A relationship stated by one party binds no one else: a device's owner can state that a vessel is responsible for the device, but the vessel has not agreed.
+A relationship that binds both of the Things it relates, such as a responsible party's acceptance of responsibility for a device, or a charter, is **contractual**,
+and holds only when the owners of both have signed it, or one owner when both Things have the same owner.
+Each owner adds a proof of its own, and together they form a proof set (@sec-trust-security).
+
+::: {.requirement #ncf-sem-006}
+**NCF-SEM-006** · *Draft*\
+A receiver MUST NOT treat a contractual relationship as holding unless the owners of both of the Things it relates have signed it.
+:::
+
+A relationship is stated once, by the Thing it is from or as a Thing of its own.
+The Thing it is to need not state the inverse: an organism need not list the sightings of it.
+Finding the relationships that point to a Thing is a query over other owners' Things, for a service that indexes them, and not part of the model.
+
+See [provisional decision 0023](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0023-relationships.md).
 
 ::: {.callout-warning title="To be written"}
 Relationships for data ownership and responsibility.
@@ -100,9 +141,246 @@ Receivers need to be able to tell which applies.
 It MUST be possible for a publisher to state the license or usage terms that apply to any Thing.
 :::
 
-::: {.callout-warning title="To be written"}
-Which property expresses the terms (for example `dcterms:license`); how terms are inherited, for example by the observations in a collection;
-and how they are carried, or at least referenced, over constrained transports.
+The terms are stated with `dcterms:license` [@dcmi-terms], whose value is the IRI of a license, such as a Creative Commons license.
+Where the terms are the owner's own, the license is an ODRL policy [@odrl-model], which can state permissions, prohibitions and duties in a form a receiver can read, such as use for navigation only, or deletion after a period.
+`dcterms:rightsHolder` names who holds the rights, and `dcterms:rights` can add a statement for people.
+
+The terms belong to a version (@sec-versions): the owner states them in the Thing, they are signed with it, and they can change from one version to the next.
+A copy carries the terms of the version it holds.
+Whether a change of terms affects copies already made is for the terms to say.
+
+A Thing need not state terms of its own.
+One that does not takes them from the Thing it is part of, such as an occurrence from its event, or a record from its dataset with `dcterms:isPartOf`, and failing that from the default terms its owner publishes.
+A receiver that finds no terms by any of these means knows of no license, and does not assume that the Thing is free to use.
+
+::: {.requirement #ncf-sem-021}
+**NCF-SEM-021** · *Draft*\
+A Thing that states no terms of its own MUST be governed by the terms of the Thing it is part of, and failing that by its owner's default terms.
+:::
+
+::: {.requirement #ncf-sem-022}
+**NCF-SEM-022** · *Draft*\
+A receiver that finds no terms for a Thing MUST NOT assume that the Thing is free to use.
+:::
+
+A Thing derived from others names their versions ([NCF-TRU-005](trust-security.qmd#ncf-tru-005)), so its terms can be checked against theirs, for example against an input's requirement to share alike.
+Whether the terms are compatible is the responsibility of whoever derives the Thing, not of the framework.
+
+A transport that cannot carry terms, such as AIS or NMEA 2000, loses them, and the receiver's copy is incomplete ([NCF-SEM-012](#ncf-sem-012)).
+A receiver that needs the terms fetches the Thing by its IRI; it does not take a broadcast to be free to use.
+
+Usage terms say what a holder may do with a copy of a Thing.
+Who may read or change the Thing at all is a different matter, set by the authorization policy of its origin (@sec-identity-authorization).
+
+See [provisional decision 0026](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0026-rights-and-usage.md).
+
+::: {.callout-warning title="Open question"}
+Which ODRL actions and constraints does the framework need, such as use for navigation only, and does it define an ODRL profile for them?
+How does an owner publish its default terms, and how does a receiver find them?
+:::
+
+## Changes {#sec-changes}
+
+A Thing changes in one of three ways:
+
+Create
+: A Thing now exists, under a new identifier.
+
+Update
+: A Thing is modified, and keeps its identifier ([NCF-SEM-002](#ncf-sem-002)).
+  Withdrawing or canceling a Thing is an update: the Thing still exists, and says that it has been withdrawn or canceled.
+
+Delete
+: A Thing is removed, and its identifier no longer identifies anything.
+  Whether the identifier may later identify another Thing is for the authority that assigns it.
+
+### Origins and cached representations {#sec-origins}
+
+A Thing has one owner, and its changes are applied only by its **origin**: the server, or servers, that hold the Thing for its owner, not as a proxy or a cache.
+An origin can be split across several servers: between a vessel and its shadow ashore (@sec-architecture), among servers on board, or among servers ashore, such as in several regions of a cloud.
+The servers of a split origin are together responsible for the Thing's consistency, as the replicas of a replicated database are.
+While they cannot reach one another, each may serve, and if it chooses accept, changes of its own, so that participants on either side see a different branch of the Thing's versions; once they can, they merge the branches into one current version (@sec-versions).
+How they keep consistent is for them: an origin that accepts changes to a Thing at only one server at a time never branches, and one that accepts them anywhere merges.
+
+Every other copy of a Thing is a **cached representation**, such as a vessel's copy of an authority's notice, or a chartplotter's copy of a sighting.
+A cached representation changes only with changes from the origin, attributed to the Thing's owner by a signature or by trust in the transport that carried them (@sec-trust-security).
+
+::: {.requirement #ncf-sem-031}
+**NCF-SEM-031** · *Draft*\
+A change to a Thing MUST be applied only by the Thing's origin; every other copy of the Thing is a cached representation.
+:::
+
+::: {.requirement #ncf-sem-032}
+**NCF-SEM-032** · *Draft*\
+The servers of a split origin MUST merge every branch of a Thing's versions, so that they come to agree on one current version.
+:::
+
+::: {.requirement #ncf-sem-033}
+**NCF-SEM-033** · *Draft*\
+A participant MUST NOT update a cached representation of a Thing with a change that it cannot attribute to the Thing's owner.
+:::
+
+### Scheduled changes
+
+A change can be **scheduled**: given in advance, with the time at which it takes effect.
+Expiry is a scheduled update: a notice that expires at a stated time says, in effect, "unless you hear otherwise, apply this update then" (@sec-vocab-notices).
+A create is never scheduled.
+A Thing that comes into force later is created at once, with a scheduled update that brings it into force, so that the date it comes into force can itself be changed.
+
+A scheduled change names the version of the Thing it was scheduled against (@sec-versions).
+At its time, the origin, and every participant that holds a cached representation, applies it if the Thing is still at that version, and discards it otherwise.
+Any change to the Thing therefore cancels the changes scheduled against its earlier version, so that no scheduled change takes effect on a Thing its owner has since revised.
+An owner that revises a Thing restates, in the same change, every scheduled change it means to keep.
+A schedule held within the Thing, such as the end of a notice's validity, is restated by every update.
+
+::: {.requirement #ncf-sem-030}
+**NCF-SEM-030** · *Draft*\
+At the time a scheduled change to a Thing states, the Thing's origin, and every participant that holds a cached representation of the Thing, MUST apply the change if the Thing is still at the version the change was scheduled against, and MUST discard the change otherwise.
+:::
+
+A scheduled change is held within the Thing, or in another container that the Thing references, such as a work queue; either way a receiver reaches it from the Thing.
+Over a transport that cannot carry references, a scheduled change travels within the message, as the duration of an AIS Area Notice does (@sec-binding-ais).
+
+Because a scheduled change needs no further message, a participant applies it to a cached representation even when it has lost contact with the Thing's origin.
+Applying it gives the Thing a new version, the one the change names ([NCF-SEM-042](#ncf-sem-042)), so the copy is still a cached representation of the origin's Thing, refreshed as the owner directed.
+Copies that apply the change independently reach that version eventually, not at one instant: copies of a Thing are not required to agree at every moment, since some are held by participants that are offline.
+
+The time of a scheduled change is in UTC.
+A participant without a synchronized clock judges the time as best it can, and records in the provenance of its copy (@sec-trust-security) that it applied the change by an unsynchronized clock.
+
+### Validity {#sec-validity}
+
+A value's **validity** is how long it holds in the world: a heading for a few seconds, an AIS target until it is lost, a notice for its period of validity.
+Validity belongs to the Thing.
+It is distinct from cache freshness, how long a cached representation may be used before it is checked with the origin, which each binding defines for its transports (Part III), as HTTP does with `Cache-Control` [@rfc9111].
+A binding may derive a cache's freshness from the Thing's next scheduled change.
+
+Validity is expressed as a scheduled update that marks the value as no longer current: "unless you hear otherwise, this value is stale at this time".
+Each update that gives a new value restates it with a later time, so a value that is updated regularly never lapses, and one whose updates stop lapses at its time,
+at the origin and at every cached representation, whether or not they are in contact.
+A value that lapses keeps its last value, marked as no longer current, and the Thing is not deleted: an AIS target that is lost, for example, remains at its IRI, marked as lost.
+
+A message is a change to a Thing if it changes anything about it, its validity included.
+A reading repeated with the same value is therefore a change, since it renews the value's validity, while a notice repeated with the same content is not, since its validity has a fixed end.
+
+A value whose validity differs from the rest of a Thing's, such as a vessel's position beside its name, is a Thing of its own, to which the vessel refers (@sec-relationships).
+It then has its own versions and its own validity, and an update to it restates nothing else.
+
+::: {.requirement #ncf-sem-034}
+**NCF-SEM-034** · *Draft*\
+A value whose validity differs from that of the rest of a Thing SHOULD be a Thing of its own.
+:::
+
+A value with no scheduled update holds until it is changed.
+A receiver may still apply a policy of its own, such as showing a position older than a minute as uncertain, or discarding a cached representation it no longer needs.
+That is the receiver's presentation or housekeeping, not a change to the Thing: it makes no new version, and the Thing remains at its origin (@sec-origins).
+
+::: {.requirement #ncf-sem-035}
+**NCF-SEM-035** · *Draft*\
+A participant MUST NOT publish as a change to a Thing what is only its own policy for presenting or discarding its cached representation of the Thing.
+:::
+
+See [provisional decision 0022](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0022-validity.md).
+
+::: {.callout-warning title="Open question"}
+How is a value marked as no longer current: by a status the framework defines, or by terms of each vocabulary?
+Does every value state when it was measured or observed, as distinct from when its version was made, so that a receiver can judge its age?
+:::
+
+Each binding carries these changes in its own terms (Part III).
+Each create and update gives the Thing a new version (@sec-versions).
+
+See [provisional decision 0019](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0019-kinds-of-change.md).
+
+::: {.callout-warning title="Open question"}
+Can a delete be scheduled, as well as an update?
+:::
+
+## Versions {#sec-versions}
+
+A Thing changes over its life while keeping its identifier ([NCF-SEM-002](#ncf-sem-002)).
+Each create and update gives it a new **version**: its state from that change until the next.
+A receiver needs to tell which version of a Thing it holds, and whether that is the latest.
+
+A version is identified by an IRI of its own, which the Thing's owner assigns.
+The Thing's IRI refers to the Thing, whichever version is current; a version's IRI refers to that version alone.
+Beyond being an IRI, a version's identifier is opaque: an owner forms it as it chooses, and a receiver does not derive it from the Thing's content.
+
+::: {.requirement #ncf-sem-040}
+**NCF-SEM-040** · *Draft*\
+Each version of a Thing MUST be identified by an IRI, assigned by the Thing's owner and distinct from the Thing's own IRI.
+:::
+
+Only a Thing's origin changes it (@sec-origins), so its versions usually form a single line.
+A split origin can branch them while its servers cannot reach one another, and then merges the branches.
+Each version but the first names the version it succeeds, and a version that merges branches names the latest version of each.
+One version is newer than another if it descends from it; two versions on different branches are concurrent, and neither is newer.
+A receiver that holds two versions of a Thing, perhaps received by different routes, tells which is newer by following their predecessors.
+When a version was made, for example as `dcterms:modified` [@dcmi-terms], is a hint, not the order.
+A merge is a change, so it cancels the changes scheduled against the versions it merges, unless it restates them (@sec-changes).
+
+::: {.requirement #ncf-sem-041}
+**NCF-SEM-041** · *Draft*\
+Each version of a Thing but the first MUST name the version or versions it succeeds.
+:::
+
+A receiver keeps the newer of two versions, so that an older version, replayed to it with its valid signature, cannot take the place of one that succeeds it (@sec-threat-replay).
+
+::: {.requirement #ncf-sem-044}
+**NCF-SEM-044** · *Draft*\
+A receiver MUST NOT replace its copy of a Thing with a version that its copy descends from.
+:::
+
+A scheduled change names the version it produces, as well as the version it was scheduled against (@sec-changes).
+A receiver that applies it while out of contact with the owner then holds the same version as the owner, under the same IRI.
+
+::: {.requirement #ncf-sem-042}
+**NCF-SEM-042** · *Draft*\
+A scheduled change MUST name the version of the Thing it produces.
+:::
+
+A version's IRI is part of the Thing's representation, so that it is the same whichever representation or transport carries the Thing.
+A transport's own validators, such as HTTP entity tags [@rfc9110], are the server's choice, and a server can derive them from the version's IRI.
+A transport that cannot carry the version, as AIS cannot, gives the receiver an incomplete copy ([NCF-SEM-012](#ncf-sem-012)).
+
+### Earlier versions
+
+The owner of a Thing may keep its earlier versions, each available at its version's IRI.
+The version link relations [@rfc5829] link them: `latest-version` to the current version, `predecessor-version` and `successor-version` between versions, and `version-history` to the list of versions.
+A version can also refer to the Thing it is a version of, for example with `dcterms:isVersionOf`.
+A version's IRI identifies the version whether or not the owner keeps it, as a deleted Thing's IRI does.
+
+A reference to a Thing refers to it whichever version is current.
+A reference that needs the Thing as it stood at a given time, such as a record that a vessel was within a notice's zone, names the version by its IRI.
+
+### Short identifiers
+
+A version's IRI, written in full, can be long for a constrained transport.
+A representation can write it as a relative IRI, which resolves against the document's base as every IRI in it does [@json-ld11]:
+for example, against a notice at `https://example.org/notices/kitkat-zone`, the relative IRI `kitkat-zone/versions/7` resolves to `https://example.org/notices/kitkat-zone/versions/7`.
+An owner can also give a version a short IRI, from a URL shortener, that redirects to the version's IRI.
+The short IRI is only a locator: the version is identified by the IRI its representation gives itself, not by the address it was reached by.
+
+A JSON-LD document's base, against which its relative IRIs resolve, is by default the location it was finally retrieved from, after any redirects except a 303 See Other [@json-ld11-api].
+So that a version's identity never depends on how it was reached, its representation gives its own IRI in full, or sets its base.
+
+::: {.requirement #ncf-sem-043}
+**NCF-SEM-043** · *Draft*\
+The representation of a version MUST give the version's IRI as an absolute IRI, or set the base against which its relative IRIs resolve.
+:::
+
+See [provisional decision 0020](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0020-versions.md).
+
+::: {.callout-warning title="Open question"}
+What does a receiver that holds two concurrent versions of a Thing do until a version that merges them reaches it: keep the one it received last, prefer the one made later, or hold both?
+:::
+
+::: {.callout-warning title="Open question"}
+Which terms state the version a representation carries and the version it succeeds: link relations such as `predecessor-version`, DCMI terms, PROV-O's `prov:wasRevisionOf` [@prov-o], or terms of the framework's own?
+:::
+
+::: {.callout-warning title="Open question"}
+Does every Thing that ends, such as an expired notice or an organism that has died, remain available at its IRI, ended by an update rather than deleted (@sec-changes), as a notice does ([NCF-VOC-NOT-001](../vocab/notices.qmd#ncf-voc-not-001))?
 :::
 
 ## Consistency across transports {#sec-consistency}
