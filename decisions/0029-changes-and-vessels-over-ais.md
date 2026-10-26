@@ -10,6 +10,7 @@ Decisions 0019 to 0022 define the kinds of change, scheduled changes, versions a
 AIS carries repeated messages rather than kinds of change, has no version, and identifies a Thing only by an alias whose linkage identifier is reused.
 The binding did not say how its messages map to changes, when an alias ends, how an AIS copy relates to the owner's version fetched over IP, or how vessels heard over AIS are represented.
 The DAC 366 Area Notice and DAC 367 Geographic Notice specifications cancel a notice with a message under the same linkage identifier, with the cancellation area type, a duration of 0 and a start time marked not available.
+The IALA ASM collection gives the rate at which either notice is repeated as an operational choice, nominally every five minutes, and lists the DAC 366 Area Notice as deprecated in favor of the DAC 367 Geographic Notice.
 
 ## Decision
 
@@ -25,4 +26,4 @@ The DAC 366 Area Notice and DAC 367 Geographic Notice specifications cancel a no
 
 Applied in the AIS binding (Receiving changes; Changes over AIS and Vessels under Representation, with a row in the concept table; Fidelity; Identity of sightings and notices), the references (the DAC 366 and DAC 367 notice specifications, and ITU-R M.585 for MMSIs), and the glossary (MMSI).
 
-Still open: whether the IMO and DAC 200 notices cancel in the same way; what an undefined duration means; which reporting intervals set a vessel's validity, and after how many missed reports it is lost; whether the unique identifier the DAC 367 Geographic Notice anticipates would serve as a longer-lived alias.
+Still open: which of the two notices should carry a notice, given the deprecation and what displays in service show of each; whether the IMO and DAC 200 notices cancel in the same way; what an undefined duration means; which reporting intervals set a vessel's validity, and after how many missed reports it is lost; whether the unique identifier the DAC 367 Geographic Notice anticipates would serve as a longer-lived alias.

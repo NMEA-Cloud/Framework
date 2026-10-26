@@ -191,6 +191,13 @@ What AIS carries are the changes to it (@sec-changes): its creation and its upda
 A notice of a management area that moves with an organism is carried with the area the zone covers at the time, and each move is an update (@sec-management-areas).
 See [provisional decision 0017](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0017-sightings-organisms-notices.md).
 
+The ASM collection lists the DAC 366 Area Notice as deprecated, with the DAC 367 Geographic Notice as its successor, and the Geographic Notice as in testing [@iala-asm-366-22; @iala-asm-367-22].
+
+::: {.callout-warning title="Open question"}
+Which should carry a notice: the DAC 366 Area Notice, which the ASM collection deprecates, or the DAC 367 Geographic Notice, its successor and still in testing, given what displays in service show of each?
+How does the Area Notice of IMO SN.1/Circ.289 [@imo-sn1-circ289] stand beside them?
+:::
+
 ### Changes over AIS {#sec-ais-changes}
 
 AIS has messages, repeated, rather than kinds of change, so a receiver tells the kind of change from the alias a message is carried under (@sec-ais-identity):
@@ -209,6 +216,8 @@ and a receiver takes it as an update that withdraws the notice.
 
 A notice's start time and duration are its scheduled updates: it comes into force at its start and expires at its end ([NCF-SEM-030](../overview/semantic-model.qmd#ncf-sem-030)), by UTC, to which AIS stations are synchronized [@itu-m1371].
 A notice that a receiver stops hearing before its end has not changed: it holds until it expires or is canceled, since not hearing it is not a change to it ([NCF-SEM-035](../overview/semantic-model.qmd#ncf-sem-035)).
+How often a station repeats a notice is the operator's choice, for which the ASM collection suggests a nominal interval of five minutes for both notices [@iala-asm-366-22; @iala-asm-367-22].
+A receiver therefore cannot read a withdrawal into silence.
 
 An alias lasts until the Thing it identifies expires or is withdrawn.
 A message under the same station and linkage identifier after that is a new Thing, under a new alias, even though the identifiers are the same.

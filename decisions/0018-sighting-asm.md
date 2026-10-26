@@ -7,7 +7,7 @@
 ## Context
 
 Decision 0012 carries a sighting from shore to ship in an Area Notice ASM whose sub-area is a point.
-That reaches displays that already show Area Notices, but it loses most of the sighting:
+That reaches the displays that show Area Notices, but it loses most of the sighting:
 what was seen, how many, the breakdown into occurrences (decision 0011), which way the animals were heading, how well the position is known, and who observed it.
 
 It also leaves a receiver unable to tell a sighting from a notice.
@@ -19,12 +19,12 @@ That is to be confirmed against the IALA collection of ASMs.
 
 ## Options considered
 
-1. **A point Area Notice only, as now.** Shown by existing displays; carries almost nothing of the sighting, and cannot be told from a notice.
+1. **A point Area Notice only, as now.** Shown by displays that support the Area Notice; carries almost nothing of the sighting, and cannot be told from a notice.
 2. **A point Area Notice with defined text.** Text in a fixed form that people can read and software can recognize.
-   Still shown by existing displays; carries what was seen, how many and the heading, in as much text as fits; marks the message as a sighting.
+   Still shown by those displays; carries what was seen, how many and the heading, in as much text as fits; marks the message as a sighting.
 3. **A Sighting ASM.** A message of its own, carrying the sighting's content compactly.
    Unambiguous and as complete as AIS allows; but it needs a DAC and FI to be allocated, and displays show nothing of it until manufacturers implement it.
-4. **Both 2 and 3.** The Sighting ASM for receivers that know it; the point Area Notice with defined text for the displays in service.
+4. **Both 2 and 3.** The Sighting ASM for receivers that know it; the point Area Notice with defined text for the displays that show Area Notices.
 
 ## Decision (proposed)
 
@@ -90,3 +90,4 @@ Still open:
 - The list of names, and how names that differ by region are handled (a right whale in the North Atlantic is not the species of the North Pacific).
 - The codes for position uncertainty and life stage, which depend on the controlled vocabularies still open in decision 0011.
 - Sightings from vessels whose AIS stations cannot transmit ASMs (see the AIS binding's constraints).
+- Which Area Notice, the IMO SN.1/Circ.289 message or DAC 366 FI 22, displays in service show.
