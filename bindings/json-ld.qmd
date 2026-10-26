@@ -256,6 +256,8 @@ All Things can be carried without loss.
 - Transport security: TLS for HTTP, with servers identified by WebPKI certificates; DTLS for `coaps:` [@rfc7252].
 - Client identity: OpenID Connect; authorization: OAuth 2.0 (@sec-trust-security).
 - Persistent signatures: Data Integrity proofs over the canonical RDF dataset of the Thing's version, embedded in the JSON-LD representation ([NCF-TRU-002](../overview/trust-security.qmd#ncf-tru-002)).
+- Content keys: a client requests the Thing a sealed part names by `kid` with its own authorization, and receives the key as a JWE encrypted to the client's public key ([NCF-TRU-013](../overview/trust-security.qmd#ncf-tru-013)); the response is the client's alone, so a shared cache does not store it [@rfc9111].
+  A client that gives its public key in the request uses an access token bound to it ([NCF-TRU-015](../overview/trust-security.qmd#ncf-tru-015)).
 
 OSCORE [@rfc8613] can protect CoAP messages end to end, including through proxies.
 Like TLS and DTLS, it protects a message in transit, not the Thing after it is received, so it does not replace a persistent signature.
@@ -264,6 +266,10 @@ Without it, a Thing sent to a multicast group is protected only by its persisten
 
 ::: {.callout-warning title="Open question"}
 Is OSCORE used to protect CoAP messages, and Group OSCORE for group communication once it is published?
+:::
+
+::: {.callout-warning title="Open question"}
+How does a request for a content key give the client's public key over HTTP and CoAP: in the body of a `POST`, in a header, or otherwise?
 :::
 
 ## Requirements

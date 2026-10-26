@@ -64,6 +64,7 @@ When the organism is not known, does the observer create one, to be identified l
 | [`dwc:eventDate`](http://rs.tdwg.org/dwc/terms/eventDate) | When |
 | [`dwc:decimalLatitude`](http://rs.tdwg.org/dwc/terms/decimalLatitude), [`dwc:decimalLongitude`](http://rs.tdwg.org/dwc/terms/decimalLongitude) | Where |
 | [`dwc:basisOfRecord`](http://rs.tdwg.org/dwc/terms/basisOfRecord) | How it was observed — for example by a human or a machine |
+| [`dwc:informationWithheld`](http://rs.tdwg.org/dwc/terms/informationWithheld) | What may be omitted from a disclosure — for example the location of an endangered species (@sec-withheld) |
 | [`dwc:Organism`](http://rs.tdwg.org/dwc/terms/Organism) | A particular organism, or a group recorded as one — for example a pod of orca |
 | [`dwc:organismID`](http://rs.tdwg.org/dwc/terms/organismID) | Identifies an organism or group |
 | [`dwc:ResourceRelationship`](http://rs.tdwg.org/dwc/terms/ResourceRelationship) | A relationship between two records — for example between a calf and its mother |
@@ -76,6 +77,20 @@ When the organism is not known, does the observer create one, to be identified l
 ::: {.callout-note title="Position"}
 Darwin Core gives a position as `dwc:decimalLatitude` and `dwc:decimalLongitude`.
 Alternatives are the common representation of position in the semantic model (@sec-semantic-model), for which candidates include GeoJSON [@rfc7946] and JSON-FG [@ogc-json-fg].
+:::
+
+### Withheld information {#sec-withheld}
+
+Some observations are sensitive, such as the location of an endangered species (@sec-threat-privacy).
+Rather than make them less specific, their owner seals the sensitive parts within the observation, and gives the keys to those with a need to know (@sec-sealed).
+Observers can also report through an intermediary, such as a sighting network, which publishes sightings of its own derived from their reports (@sec-intermediaries).
+
+An owner that omits statements instead, by selective disclosure, says what may be omitted in `dwc:informationWithheld`, in a statement that every disclosure includes,
+so that a receiver can tell a statement that was omitted from one that is missing.
+
+::: {.requirement #ncf-voc-obs-002}
+**NCF-VOC-OBS-002** · *Draft*\
+An observation from which statements may be omitted SHOULD state what may be omitted with `dwc:informationWithheld`, in a statement that every disclosure of it includes.
 :::
 
 ### Groups of organisms

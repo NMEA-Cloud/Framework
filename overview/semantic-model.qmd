@@ -324,6 +324,13 @@ A merge is a change, so it cancels the changes scheduled against the versions it
 Each version of a Thing but the first MUST name the version or versions it succeeds.
 :::
 
+A receiver keeps the newer of two versions, so that an older version, replayed to it with its valid signature, cannot take the place of one that succeeds it (@sec-threat-replay).
+
+::: {.requirement #ncf-sem-044}
+**NCF-SEM-044** · *Draft*\
+A receiver MUST NOT replace its copy of a Thing with a version that its copy descends from.
+:::
+
 A scheduled change names the version it produces, as well as the version it was scheduled against (@sec-changes).
 A receiver that applies it while out of contact with the owner then holds the same version as the owner, under the same IRI.
 

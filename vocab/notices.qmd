@@ -163,3 +163,5 @@ Anyone can issue a notice: the framework cannot prevent a participant from publi
 Whether a receiver acts on a notice depends on its relationship to the issuer, and on its trust in the issuer's identity.
 That trust differs by transport (@sec-trust-security):
 over IP it rests on the issuer's identity as a data owner (@sec-data-owners), and over VHF on the regulation of who may transmit (@sec-ais-trust).
+
+An authority publishes its current notices as a collection, so that a receiver can tell whether it has missed one ([NCF-TRU-008](../overview/trust-security.qmd#ncf-tru-008)).

@@ -42,6 +42,9 @@ Class B
 CoAP
 : Constrained Application Protocol — a web transfer protocol for constrained devices and networks, carried over UDP [@rfc7252].
 
+Content key
+: A single-use key that a sealed part is encrypted with, held in a Thing of its own and given to each receiver encrypted to that receiver's public key (@sec-sealed).
+
 Contractual relationship
 : A relationship that binds both of the Things it relates, such as a charter, and holds only when the owners of both have signed it (@sec-relationships).
 
@@ -53,6 +56,15 @@ Data owner
 
 Designation
 : A relationship in which one party names another as authoritative for a kind of information in an area; the way authority is conferred (@sec-provenance).
+
+Distrust statement
+: A Thing in which a party says that a receiver should not rely on other Things, some of their versions, or what a source made over a period; the owner's own is its revocation (@sec-distrust).
+
+DNSSEC
+: The DNS Security Extensions, which sign DNS records, including signed proof that a name does not exist [@rfc4033].
+
+Envelope
+: What the framework itself reads to handle a Thing, which is never sealed: its IRI and type, its version and the versions it succeeds, its validity and scheduled changes, its usage terms and its proofs; the rest of the Thing is its content (@sec-sealed).
 
 Event
 : In Darwin Core, something that happens at a place during a period of time, such as a sighting.
@@ -75,6 +87,9 @@ IEC 61162-450
 
 IMO
 : International Maritime Organization — the United Nations agency responsible for the safety of shipping [@imo-ais].
+
+Intermediary
+: A participant that derives Things from information its sources report, publishes them to receivers attributed to itself, and shows their sources only to those with a need to know (@sec-intermediaries).
 
 IRI
 : Internationalized Resource Identifier [@rfc3987] — the form of every Thing's identifier.
@@ -155,6 +170,12 @@ Responsible party
 Scheduled change
 : A change given in advance with the time at which it takes effect, applied then if the Thing is still at the version it was scheduled against, such as a notice's expiry (@sec-changes).
 
+Sealed part
+: A part of a Thing encrypted within it, covered by its signature in that form, and readable only by those given its key (@sec-sealed).
+
+Selective disclosure
+: Revealing only some of the statements in a signed Thing, with a signature that still verifies them (@sec-sealed).
+
 Semantic model
 : The framework's common definition of what information means (@sec-semantic-model).
 
@@ -208,3 +229,6 @@ WebPKI
 
 WebSocket
 : A protocol for two-way communication between a client and a server over one connection [@rfc6455].
+
+Zero trust architecture
+: An architecture in which no device is trusted because of where it is on the network, and each request is authenticated and authorized [@nist-sp800-207].

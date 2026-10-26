@@ -34,6 +34,7 @@ They are the priority for group review.
 | [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding |
 | [0029](0029-changes-and-vessels-over-ais.md) | Changes, cancellation, aliases and vessels over AIS |
 | [0030](0030-on-board-bindings.md) | Identity, changes, validity and trust in the sentence and PGN bindings |
+| [0031](0031-threat-model.md) | A threat model, distrust statements and sealed parts |
 
 ## All decisions
 
@@ -69,6 +70,7 @@ They are the priority for group review.
 | [0028](0028-versions-caching-contexts-over-http.md) | Versions, caching, contexts and deletion in the JSON-LD binding | Provisional |
 | [0029](0029-changes-and-vessels-over-ais.md) | Changes, cancellation, aliases and vessels over AIS | Provisional |
 | [0030](0030-on-board-bindings.md) | Identity, changes, validity and trust in the sentence and PGN bindings | Provisional |
+| [0031](0031-threat-model.md) | A threat model, distrust statements and sealed parts | Provisional |
 
 ## Statuses
 
