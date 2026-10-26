@@ -204,18 +204,18 @@ Update
   A vessel's position report is different: each one renews the validity of the vessel's dynamic properties, so it is a change even when they are unchanged (@sec-ais-vessels).
 
 AIS has no delete.
-A withdrawal is an update (@sec-changes): the Area Notice and Geographic Notice ASMs of DAC 366 and DAC 367 cancel a notice with a message under the same linkage identifier whose area type is cancellation and whose duration is 0 [@asm-366-22; @asm-367-22],
+A withdrawal is an update (@sec-changes): the Area Notice and Geographic Notice ASMs of DAC 366 and DAC 367 cancel a notice with a message under the same linkage identifier whose area type is cancellation, whose duration is 0 and whose start time is marked not available [@asm-366-22; @asm-367-22],
 and a receiver takes it as an update that withdraws the notice.
 
 A notice's start time and duration are its scheduled updates: it comes into force at its start and expires at its end ([NCF-SEM-030](../overview/semantic-model.qmd#ncf-sem-030)), by UTC, to which AIS stations are synchronized [@itu-m1371].
-A notice that a receiver stops hearing before its end has not changed: it holds until it expires or is cancelled, since not hearing it is not a change to it ([NCF-SEM-035](../overview/semantic-model.qmd#ncf-sem-035)).
+A notice that a receiver stops hearing before its end has not changed: it holds until it expires or is canceled, since not hearing it is not a change to it ([NCF-SEM-035](../overview/semantic-model.qmd#ncf-sem-035)).
 
 An alias lasts until the Thing it identifies expires or is withdrawn.
 A message under the same station and linkage identifier after that is a new Thing, under a new alias, even though the identifiers are the same.
 
 ::: {.requirement #ncf-bnd-ais-003}
 **NCF-BND-AIS-003** · *Draft*\
-A receiver MUST treat a notice heard over AIS as holding until it expires or is cancelled, whether or not the receiver continues to hear it.
+A receiver MUST treat a notice heard over AIS as holding until it expires or is canceled, whether or not the receiver continues to hear it.
 :::
 
 ::: {.requirement #ncf-bnd-ais-004}
@@ -247,7 +247,8 @@ How does a receiver tell whether an Area Notice carries a sighting or a notice: 
 What do an Area Notice's start time and duration mean when it carries a sighting?
 What text does message 14 carry for a local alert?
 Which other concepts need AIS messages, and are new ASMs needed for them?
-Should a sighting have an ASM of its own, and a defined text when it is sent in an Area Notice? See [proposed decision 0018](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0018-sighting-asm.md).
+Should a sighting have an ASM of its own, and a defined text when it is sent in an Area Notice?
+See [proposed decision 0018](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0018-sighting-asm.md).
 How are IRIs reduced to identifiers small enough for AIS?
 :::
 

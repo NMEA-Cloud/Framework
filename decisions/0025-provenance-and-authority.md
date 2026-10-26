@@ -24,7 +24,7 @@ For authority:
 - The relays a Thing passed through belong to each copy's provenance; a relay that wraps a Thing makes a Thing of its own, derived from it.
 - A derived Thing names each input by the IRI of the version it used (NCF-TRU-005).
 - Option 1 for authority: authority is conferred by a designation, signed by the party that makes it; a receiver chooses the parties it trusts directly, and treats other sources as authoritative only through a chain of designations from them (NCF-TRU-006); other sources are contributors.
-- Confidence in the content is the owner's to state, in vocabulary terms such as a position's uncertainty; confidence in the source is the receiver's judgement, part of the copy's provenance.
+- Confidence in the content is the owner's to state, in vocabulary terms such as a position's uncertainty; confidence in the source is the receiver's judgment, part of the copy's provenance.
 
 ## Consequences
 

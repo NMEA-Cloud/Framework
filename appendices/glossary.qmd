@@ -2,12 +2,12 @@
 
 Terms are defined here once and used consistently throughout. Add new terms in the same change that first uses them.
 
+AIS
+: Automatic Identification System — VHF-based exchange of vessel and navigational information [@itu-m1371].
+
 Alias
 : An identifier a transport gives a Thing in place of its IRI, such as an AIS station and linkage identifier.
   An alias may be temporary, and one Thing may have several (@sec-ais-identity).
-
-AIS
-: Automatic Identification System — VHF-based exchange of vessel and navigational information [@itu-m1371].
 
 ASM
 : Application-specific message — application data carried in AIS binary messages [@imo-sn1-circ289].
@@ -201,7 +201,7 @@ Talker identifier
 : The part of an NMEA 0183 sentence that identifies its source; together with the port it arrived on, an alias of the source (@sec-binding-sentences).
 
 Thing
-:Anything the framework describes, tangible or intangible — including relationships and schemas.
+: Anything the framework describes, tangible or intangible — including relationships and schemas.
 
 Transparency log
 : A public, append-only log of certificates or signatures, which anyone can audit.

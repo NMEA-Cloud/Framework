@@ -18,7 +18,7 @@ Withdrawal and expiry both end a notice's validity, but a withdrawal is a messag
   - **create**: a Thing now exists, under a new identifier;
   - **update**: a Thing is modified, and keeps its identifier (NCF-SEM-002);
   - **delete**: a Thing is removed, and its identifier no longer identifies anything.
-- Withdrawing or cancelling a Thing is a kind of update, not a deletion: the Thing still exists, and says that it has been withdrawn or cancelled.
+- Withdrawing or canceling a Thing is a kind of update, not a deletion: the Thing still exists, and says that it has been withdrawn or canceled.
   A notice that is withdrawn or expires is therefore updated, and remains available at its IRI (NCF-VOC-NOT-001).
 - A Thing has one owner, and its changes are applied only by its origin, the server or servers that hold it for the owner, not as a proxy or cache (NCF-SEM-031).
   An origin can be split, as between a vessel and its shadow; its servers are responsible for consistency across the split, as a replicated database's replicas are, and merge any branches of a Thing's versions (NCF-SEM-032); how is for them (decision 0020).
@@ -49,5 +49,5 @@ A receiver needs a clock to apply scheduled changes, and a publisher must restat
 How a receiver that applies a scheduled change identifies the resulting version is resolved by decision 0020: the scheduled change names it.
 
 Still open: whether a delete can be scheduled, as well as an update; 
-which kinds of update a notice distinguishes, such as withdrawn, cancelled and expired, and what each tells a receiver;
+which kinds of update a notice distinguishes, such as withdrawn, canceled and expired, and what each tells a receiver;
 and how each binding announces changes, which the JSON-LD binding takes up under receiving changes.

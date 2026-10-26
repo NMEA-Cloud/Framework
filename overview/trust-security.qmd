@@ -32,7 +32,7 @@ JWE [@rfc7516] remains the working proposal for encryption.
 See [decision record 0004](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0004-trust-stack.md) and [provisional decision 0024](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0024-data-integrity-signatures.md).
 
 A signature covers one version of a Thing (@sec-versions): its state, including the Thing's IRI, the version's IRI and the versions it succeeds.
-The proof is not part of the version, since a Data Integrity proof is excluded from what it signs: adding a signature, such as the second party's to a contractual relationship (@sec-relationships), makes no new version.
+The proof is not part of the version: a Data Integrity proof covers the Thing without its proofs, together with the proof's own options, so adding a signature, such as the second party's to a contractual relationship (@sec-relationships), makes no new version.
 Several signers each add a proof of their own, forming a proof set.
 The owner of a Thing can sign in advance the version that a scheduled change produces ([NCF-SEM-042](semantic-model.qmd#ncf-sem-042)), and the scheduled change carries that proof, so that a cached representation that applies the change holds a version its owner signed (@sec-changes).
 
@@ -212,7 +212,7 @@ In what terms does a designation name a kind of information and an area?
 
 Confidence is of two kinds, as provenance is.
 Confidence in the content is the owner's to state, in the terms of each vocabulary: a position's uncertainty, such as `dwc:coordinateUncertaintyInMeters`, or an identification's verification status, such as `dwc:identificationVerificationStatus`.
-Confidence in the source is the receiver's judgement, from the copy's provenance and its trust in the owner.
+Confidence in the source is the receiver's judgment, from the copy's provenance and its trust in the owner.
 It is part of the copy's provenance, and is not published as part of the Thing.
 
 See [provisional decision 0025](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0025-provenance-and-authority.md).
@@ -422,11 +422,21 @@ A sealed part is encrypted with a single-use **content key**, used directly, wit
 Its protected header names the content key by `kid`, whose structure JOSE leaves to the application [@rfc7515]: here, the IRI of a Thing that holds the key as a JWK [@rfc7517].
 The header is covered by the encryption and, with the sealed part, by the Thing's signature.
 
+::: {.requirement #ncf-tru-012}
+**NCF-TRU-012** · *Draft*\
+A sealed part MUST be encrypted directly with a content key, and MUST name that key in its protected header by `kid`, as the IRI of the Thing that holds it.
+:::
+
 The key's Thing is a Thing like any other, with an opaque IRI ([NCF-SEM-004](semantic-model.qmd#ncf-sem-004)) and an authorization policy of its own.
 A receiver retrieves it as it retrieves any Thing, and is given it only if the policy allows; being given it is how a receiver shows its need to know.
 Each time it is given, the key is encrypted to the receiver's own public key, as an encrypted JWK [@rfc7517], so that only that receiver can read it however it travels.
 Caches and relays can therefore carry a key on its way to a receiver, and an owner can send it ahead of time to a receiver that will be out of contact.
 The key's own record of who it was given to is the record of who can read the part it seals.
+
+::: {.requirement #ncf-tru-013}
+**NCF-TRU-013** · *Draft*\
+A content key MUST be given to a receiver only as a JWE encrypted to that receiver's public key.
+:::
 
 A receiver that is given keys has a key pair for encryption, which it keeps apart from any key it signs with.
 It can give the public key in its request for a content key, and then needs no certificate for encryption.
@@ -440,16 +450,6 @@ A key sent ahead of time, without a request, is encrypted to a public key the re
 ::: {.requirement #ncf-tru-015}
 **NCF-TRU-015** · *Draft*\
 A request for a content key that gives the public key to encrypt it to MUST be made with an access token bound to the client, and MUST be signed by the client unless it travels directly to the key's holder over TLS.
-:::
-
-::: {.requirement #ncf-tru-012}
-**NCF-TRU-012** · *Draft*\
-A sealed part MUST be encrypted directly with a content key, and MUST name that key in its protected header by `kid`, as the IRI of the Thing that holds it.
-:::
-
-::: {.requirement #ncf-tru-013}
-**NCF-TRU-013** · *Draft*\
-A content key MUST be given to a receiver only as a JWE encrypted to that receiver's public key.
 :::
 
 Since every copy holds the sealed part, a key that leaks, or a cipher that is later broken, unseals every copy at once, and the size of a sealed part can itself disclose something.

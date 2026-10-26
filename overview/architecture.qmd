@@ -74,7 +74,7 @@ Shore service
   Some are **authoritative** for particular kinds of information; others are contributors.
 
 Intermediary
-: A shore service that derives Things from information its sources report, such as sightings, and publishes them attributed to itself, so that receivers need not know who its sources are (@sec-intermediaries).
+: A participant, usually a shore service, that derives Things from information its sources report, such as sightings, and publishes them attributed to itself, so that receivers need not know who its sources are (@sec-intermediaries).
 
 Client
 : Any application that consumes or presents framework information, on board or ashore.

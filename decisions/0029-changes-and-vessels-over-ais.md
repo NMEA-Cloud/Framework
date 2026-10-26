@@ -9,13 +9,13 @@
 Decisions 0019 to 0022 define the kinds of change, scheduled changes, versions and validity.
 AIS carries repeated messages rather than kinds of change, has no version, and identifies a Thing only by an alias whose linkage identifier is reused.
 The binding did not say how its messages map to changes, when an alias ends, how an AIS copy relates to the owner's version fetched over IP, or how vessels heard over AIS are represented.
-The DAC 366 Area Notice and DAC 367 Geographic Notice specifications cancel a notice with a message under the same linkage identifier, with the cancellation area type and a duration of 0.
+The DAC 366 Area Notice and DAC 367 Geographic Notice specifications cancel a notice with a message under the same linkage identifier, with the cancellation area type, a duration of 0 and a start time marked not available.
 
 ## Decision
 
 - Each AIS message is the change itself; a receiver tells the kind of change by alias: the first message under an alias is a create, one with different content an update, and an identical repetition no change.
 - AIS has no delete; a cancellation is an update that withdraws the notice.
-- A notice's start time and duration are its scheduled updates, applied by UTC; a notice a receiver stops hearing holds until it expires or is cancelled (NCF-BND-AIS-003).
+- A notice's start time and duration are its scheduled updates, applied by UTC; a notice a receiver stops hearing holds until it expires or is canceled (NCF-BND-AIS-003).
 - An alias lasts until its Thing expires or is withdrawn; a later message under the same identifiers is a new Thing (NCF-BND-AIS-004).
 - Once a receiver holds the owner's version fetched over IP, a change heard only over AIS is marked unconfirmed until the receiver fetches again (NCF-BND-AIS-005), and a disagreement with the owner's version is flagged as possibly not the owner's.
 - What AIS loses (the IRI unless a Linked Text carries it, references, version, signature, usage terms, and provenance beyond the transmitting station) makes anything held from AIS alone incomplete.

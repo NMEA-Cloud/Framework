@@ -188,7 +188,7 @@ Create
 
 Update
 : A Thing is modified, and keeps its identifier ([NCF-SEM-002](#ncf-sem-002)).
-  Withdrawing or cancelling a Thing is an update: the Thing still exists, and says that it has been withdrawn or cancelled.
+  Withdrawing or canceling a Thing is an update: the Thing still exists, and says that it has been withdrawn or canceled.
 
 Delete
 : A Thing is removed, and its identifier no longer identifies anything.

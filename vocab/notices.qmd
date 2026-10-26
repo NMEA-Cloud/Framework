@@ -27,7 +27,7 @@ The terms, meanings and sources below are candidates and have not been agreed.
 | Replaces | A notice that this one supersedes | `dcterms:replaces` — *to be confirmed* |
 | Subject | What the notice concerns, for example marine mammals in the area, or a restricted area | *To be decided*; see the descriptions of the AIS Area Notice and Geographic Notice ASMs |
 | Action | What vessels are asked to do, for example to reduce speed or keep clear | *To be decided* |
-| Status | Whether the notice is in force: active or inactive, as for a management area it announces, or withdrawn, cancelled or expired, each set by an update (@sec-changes) | *To be decided* |
+| Status | Whether the notice is in force: active or inactive, as for a management area it announces, or withdrawn, canceled or expired, each set by an update (@sec-changes) | *To be decided* |
 | Text | Words for people | *To be decided* |
 | Refers to | The Things the notice concerns, such as a management area, an organism, a sighting, or the regulation that applies | A relationship (@sec-relationships) |
 
@@ -45,7 +45,7 @@ Creation
 Update
 : The authority revises the notice: its area, its validity, its text, its status or anything else.
   It remains the same notice, with the same identifier ([NCF-SEM-002](../overview/semantic-model.qmd#ncf-sem-002)).
-  Withdrawing or cancelling the notice is an update.
+  Withdrawing or canceling the notice is an update.
 
 Coming into force
 : For a notice that applies from a later time, an update scheduled for the start of its validity.
@@ -72,7 +72,7 @@ A receiver may discard its cached representation of a notice it no longer needs,
 How a receiver tells which revision of a notice it holds, and whether it is the latest, is not particular to notices (@sec-versions).
 
 ::: {.callout-warning title="Open question"}
-Which kinds of update does a notice distinguish, such as withdrawn, cancelled and expired, and what does each tell a receiver, for example whether the notice was issued in error?
+Which kinds of update does a notice distinguish, such as withdrawn, canceled and expired, and what does each tell a receiver, for example whether the notice was issued in error?
 :::
 
 ## Identity of a notice {#sec-notice-identity}

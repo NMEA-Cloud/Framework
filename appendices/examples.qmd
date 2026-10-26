@@ -8,6 +8,7 @@ Namespaces are not yet decided ([decision 0006](https://github.com/NMEA-Cloud/Fr
 so the framework's own terms are written under `https://example.org/vocab/`, and the examples share a context published at `https://example.org/context.jsonld`.
 Terms reused from other vocabularies, such as Darwin Core [@darwin-core] and the DCMI metadata terms, keep their published IRIs.
 The terms and values are illustrative: the candidate terms of each vocabulary module have not been agreed.
+The examples leave out the IRIs of their versions and of the versions they succeed ([NCF-SEM-040](../overview/semantic-model.qmd#ncf-sem-040), [NCF-SEM-041](../overview/semantic-model.qmd#ncf-sem-041)), since the terms that state them are still open (@sec-versions).
 
 ## The context {#sec-example-context}
 
@@ -23,6 +24,7 @@ The terms and values are illustrative: the candidate terms of each vocabulary mo
     "xsd": "http://www.w3.org/2001/XMLSchema#",
     "label": "rdfs:label",
     "issuer": {
+      "@id": "prov:wasAttributedTo",
       "@type": "@id"
     },
     "refersTo": {
@@ -104,7 +106,8 @@ The terms and values are illustrative: the candidate terms of each vocabulary mo
 `area`, `validity` and `lastKnownPlace` are JSON literals holding JSON-FG geometry and time objects [@ogc-json-fg], so that a place keeps JSON-FG's own form, including circular arcs.
 `carriedOverAis` is a JSON literal too, so that the examples have no blank nodes and can be signed cheaply (@sec-trust-security).
 `monitor` is named by the IANA relation IRI ([NCF-BND-JSONLD-002](../bindings/json-ld.qmd#ncf-bnd-jsonld-002)),
-and `license` is `dcterms:license`, one way of stating terms of use ([NCF-SEM-020](../overview/semantic-model.qmd#ncf-sem-020)).
+`license` is `dcterms:license`, one way of stating terms of use ([NCF-SEM-020](../overview/semantic-model.qmd#ncf-sem-020)),
+and `issuer` is `prov:wasAttributedTo`, the candidate term for a notice's issuer (@sec-vocab-notices).
 Darwin Core terms in the `dwc:` namespace hold text, as Darwin Core intends, and those in the `dwciri:` namespace hold IRIs (@sec-sightings-organisms).
 
 ## An organism {#sec-example-organism}
