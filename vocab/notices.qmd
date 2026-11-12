@@ -1,0 +1,167 @@
+# Notices {#sec-vocab-notices}
+
+[Normative]{.status}
+
+Terms for **notices**: Things an authority issues about an area, or about other Things, for the attention of those who are or may be there.
+Examples are a management zone, an exclusion zone around a whale, and a navigational warning.
+
+A notice is not an observation (@sec-vocab-observations).
+A sighting records what someone saw; a notice says what an authority advises, requests or requires, and it may refer to what was seen (@sec-sightings-organisms).
+The two can travel in the same message, as over AIS, without becoming one another (@sec-binding-ais).
+
+See [provisional decision 0017](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0017-sightings-organisms-notices.md).
+
+## What a notice holds
+
+::: {.callout-note title="Placeholder"}
+The terms, meanings and sources below are candidates and have not been agreed.
+:::
+
+| Term | Meaning | Possible source |
+|---|---|---|
+| Notice | A Thing an authority issues about an area or other Things | *To be decided* |
+| Issuer | The authority that issued the notice, by IRI | `prov:wasAttributedTo` [@prov-o] — *to be confirmed* |
+| Area | Where the notice applies | Area, in the core vocabulary (@sec-vocab-core) |
+| Validity | The period during which the notice applies; its end is a scheduled update (@sec-changes) | Time, in the core vocabulary (@sec-vocab-core); `dcterms:valid` — *to be confirmed* |
+| Issued, modified | When the notice was issued, and when it last changed | `dcterms:issued`, `dcterms:modified` — *to be confirmed* |
+| Replaces | A notice that this one supersedes | `dcterms:replaces` — *to be confirmed* |
+| Subject | What the notice concerns, for example marine mammals in the area, or a restricted area | *To be decided*; see the descriptions of the AIS Area Notice and Geographic Notice ASMs |
+| Action | What vessels are asked to do, for example to reduce speed or keep clear | *To be decided* |
+| Status | Whether the notice is in force: active or inactive, as for a management area it announces, or withdrawn, canceled or expired, each set by an update (@sec-changes) | *To be decided* |
+| Text | Words for people | *To be decided* |
+| Refers to | The Things the notice concerns, such as a management area, an organism, a sighting, or the regulation that applies | A relationship (@sec-relationships) |
+
+: Candidate terms for notices {#tbl-notice-terms}
+
+A notice's terms of use are stated by its issuer, as for any Thing ([NCF-SEM-020](../overview/semantic-model.qmd#ncf-sem-020)).
+
+## The life of a notice
+
+A notice changes over its life as any Thing does (@sec-changes), and each change is made by its issuer:
+
+Creation
+: The authority issues the notice.
+
+Update
+: The authority revises the notice: its area, its validity, its text, its status or anything else.
+  It remains the same notice, with the same identifier ([NCF-SEM-002](../overview/semantic-model.qmd#ncf-sem-002)).
+  Withdrawing or canceling the notice is an update.
+
+Coming into force
+: For a notice that applies from a later time, an update scheduled for the start of its validity.
+  The notice is created at once, so that the start can be changed.
+
+Expiry
+: An update scheduled for the end of its validity.
+
+Both are held within the notice, as its validity, so every revision of the notice restates them, and a revision that changes the validity reschedules them ([NCF-SEM-030](../overview/semantic-model.qmd#ncf-sem-030)).
+
+A binding that cannot carry a notice whole carries these changes instead, as the AIS binding does (@sec-binding-ais).
+
+A notice that is withdrawn or expires is updated, not deleted.
+It remains available at its IRI, marked as withdrawn or expired, so that references to it, from other notices, from sightings or from records, do not dangle.
+
+::: {.requirement #ncf-voc-not-001}
+**NCF-VOC-NOT-001** · *Draft*\
+A notice that is withdrawn or expires SHOULD remain available at its IRI, marked as withdrawn or expired.
+:::
+
+The requirement is on the notice's origin (@sec-origins).
+A receiver may discard its cached representation of a notice it no longer needs, which is not a change to the notice (@sec-validity).
+
+How a receiver tells which revision of a notice it holds, and whether it is the latest, is not particular to notices (@sec-versions).
+
+::: {.callout-warning title="Open question"}
+Which kinds of update does a notice distinguish, such as withdrawn, canceled and expired, and what does each tell a receiver, for example whether the notice was issued in error?
+:::
+
+## Identity of a notice {#sec-notice-identity}
+
+A notice's identifier is the IRI its issuer gives it.
+Every participant that holds or relays the notice identifies it by that IRI once it knows it, so that the notice is the same Thing wherever it is held ([NCF-SEM-002](../overview/semantic-model.qmd#ncf-sem-002)).
+A receiver's copy of a notice is the notice itself, held as a cached representation (@sec-origins), not a Thing of the receiver's own.
+What the receiver knows about its copy, such as when and over which transport it was received and whether it is complete, is the provenance of the copy (@sec-trust-security), not part of the notice.
+
+::: {.requirement #ncf-voc-not-002}
+**NCF-VOC-NOT-002** · *Draft*\
+A participant that holds or relays a notice MUST identify it by the IRI its issuer gave it, once it knows that IRI.
+:::
+
+A transport that cannot carry the IRI identifies a notice by an alias instead, as AIS does (@sec-ais-identity).
+
+## Kinds of notice
+
+Notices of management areas
+: A notice that announces a management area (@sec-management-areas), its activation for a period, or a change to it.
+
+Zones around organisms
+: A zone around an organism, such as a whale (@sec-sightings-organisms): either a management area that moves with the organism, which a notice says is active or not,
+  or a notice with an area of its own (@sec-management-areas).
+
+Navigational warnings
+: Warnings of dangers to navigation.
+  IHO S-124 specifies navigational warnings for S-100 systems, including NAVAREA, coastal and local warnings, with their areas and cancellations [@iho-s124].
+
+## Management areas {#sec-management-areas}
+
+A **management area** is an area in which official rules apply to vessels, such as limits on speed, for example in a protected area.
+It is not a notice but a Thing of its own, with its own IRI, usually defined in regulation and standing for years.
+A notice refers to it: to announce it, its activation for a period, or a change to it.
+The management area is the same Thing in every notice that refers to it ([NCF-SEM-002](../overview/semantic-model.qmd#ncf-sem-002)).
+
+A management area's area is either fixed or relative:
+
+Fixed
+: A shape on the chart, as for a protected area defined in regulation.
+
+Relative
+: A rule that places the area relative to another Thing, such as within 1000 m of an organism, so that the area moves with it.
+  The rule may be given for a kind of Thing, such as a species, so that it applies around every organism of that species.
+  The area at any time follows from the Thing's last known position.
+
+A notice that refers to a relative management area says whether it is active.
+For example, an authority may mark a whale's zone inactive when the whale's position has become too uncertain.
+
+Not every zone is a management area.
+An authority may also issue a notice that defines an area of its own, for a zone that no standing rule describes.
+
+::: {.callout-note title="Placeholder"}
+The terms, meanings and sources below are candidates and have not been agreed.
+:::
+
+| Term | Meaning | Possible source |
+|---|---|---|
+| Management area | An area in which official rules apply to vessels | *To be decided* |
+| Responsible authority | The authority responsible for the area, by IRI | *To be decided* |
+| Area | Where the rules apply, if the area is fixed | Area, in the core vocabulary (@sec-vocab-core) |
+| Relative to | The Thing, or kind of Thing such as a species, that a relative area moves with | A relationship (@sec-relationships) |
+| Distance | How far from that Thing a relative area extends | *To be decided* |
+| Rules | The regulation that defines the area and what it requires | A relationship (@sec-relationships) |
+| Applies to | The vessels the rules apply to, for example by length or speed | *To be decided* |
+
+: Candidate terms for management areas {#tbl-management-area-terms}
+
+See [provisional decision 0017](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0017-sightings-organisms-notices.md).
+
+::: {.callout-warning title="Open question"}
+How are relative areas expressed, beyond a distance from a Thing, given that a geometry cannot express them?
+Does a relative area grow with the uncertainty of the Thing's position, or does the notice go inactive instead, and who decides?
+Is a rule given for a species one management area, or one for each organism it applies around?
+Is a notice's status a property of the notice, or is an inactive zone a withdrawal?
+:::
+
+::: {.callout-warning title="Open question"}
+How do notices relate to S-124 navigational warnings: is a navigational warning a kind of notice, and can a notice be mapped to and from an S-124 warning without loss?
+:::
+
+## Authorities
+
+An authority is a participant that issues notices under its own responsibility, such as a maritime administration or a wildlife management agency.
+Like every Thing it is identified by an IRI, and as a data owner it can sign its notices (@sec-data-owners).
+
+Anyone can issue a notice: the framework cannot prevent a participant from publishing or transmitting one, and does not try to.
+Whether a receiver acts on a notice depends on its relationship to the issuer, and on its trust in the issuer's identity.
+That trust differs by transport (@sec-trust-security):
+over IP it rests on the issuer's identity as a data owner (@sec-data-owners), and over VHF on the regulation of who may transmit (@sec-ais-trust).
+
+An authority publishes its current notices as a collection, so that a receiver can tell whether it has missed one ([NCF-TRU-008](../overview/trust-security.qmd#ncf-tru-008)).

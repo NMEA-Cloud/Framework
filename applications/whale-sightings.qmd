@@ -14,25 +14,35 @@ and it needs to reach vessels whether or not they are connected to the internet.
 sequenceDiagram
   participant O as Observer
   participant S as Shore sighting<br/>service
+  participant AU as Authority
   participant SH as Shadow of<br/>Vessel B
   participant G as Vessel B<br/>gateway
   participant D as Vessel B<br/>display
   participant A as Vessel A AIS<br/>(AIS only)
   participant DA as Vessel A<br/>display
   O->>S: Report sighting<br/>(IP, signed)
-  S->>SH: Notify of sighting in<br/>area of interest (IP)
+  S->>S: Update the organism<br/>from the sighting
+  S->>AU: Notify of sighting (IP)
+  AU->>SH: Notice of a zone<br/>around the organism (IP)
   SH->>G: Deliver when<br/>connected (IP)
   G->>D: Present on<br/>chartplotter<br/>(NMEA 2000)
-  S->>A: Broadcast via shore station<br/>(AIS)
+  S->>A: Sighting via shore station<br/>(AIS)
+  AU->>A: Notice via shore station<br/>(AIS)
   A->>DA: AIS message<br/>in a PGN<br/>(NMEA 2000)
 ```
 
-At every step it is **the same sighting**: same identity, same meaning, same provenance —
-carried at full fidelity over IP and in reduced form over AIS and NMEA 2000.
+Three Things take part, each with its own identity (@sec-sightings-organisms):
+the **sighting**, which the observer originates;
+the **organism** it observed, which the sighting service updates from it;
+and the **notice**, which the authority issues about the organism.
+
+The sighting and the notice can both reach the helm, and at every step each is **the same Thing**: same identity, same meaning, same provenance —
+carried at full fidelity over IP, and over AIS and NMEA 2000 as its changes, without its references (@sec-ais-identity).
+A sighting relayed over AIS travels in an Area Notice ASM, but it is still a sighting, not a notice.
 
 ## Walkthrough
 
 ::: {.callout-warning title="To be written"}
-The sighting as a Thing (@sec-vocab-observations); its representation in each binding;
+The sighting, the organism and the notice as Things (@sec-vocab-observations); their representation in each binding;
 how a vessel decides it is relevant; how it expires; how other mariners confirm it.
 :::

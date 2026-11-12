@@ -18,8 +18,17 @@ IEC 61162-450
 
 ### NMEA 0183
 
+#### Getting current state
+
+A participant can ask for a sentence to be transmitted, as NMEA 0183 provides.
+
+#### Receiving changes
+
+Sentences arrive as their talkers transmit them, unsolicited.
+Each sentence is the change itself, not a link to the Thing that changed (@sec-change-notifications).
+
 ::: {.callout-warning title="To be written"}
-Getting current state; receiving changes; addressing and routing; constraints.
+Addressing and routing; constraints.
 :::
 
 ### IEC 61162-450
@@ -31,6 +40,15 @@ Getting current state; receiving changes; addressing and routing; constraints.
 ## Representation
 
 Sentences that encapsulate AIS messages are a transport of the AIS binding (@sec-binding-ais), not part of this representation.
+Synthesizing such sentences on board, rather than relaying what the vessel received, is discussed in @sec-ais-on-board.
+
+### Identity and changes
+
+A sentence identifies its source only by its talker identifier, together with the port on which it arrived: that pair is an alias (@sec-ais-identity) of the source, not an identity.
+A source heard on the vessel's network is a Thing whose IRI the vessel assigns, as the authority for its own network; the IRI is opaque ([NCF-SEM-004](../overview/semantic-model.qmd#ncf-sem-004)) and does not encode the alias.
+
+A sentence that carries a reading is an update to the Thing that holds it, even when the value is unchanged, since it renews the value's validity (@sec-validity).
+NMEA 0183 does not say how long a value holds, so the binding derives a value's validity from the interval at which its talker transmits it.
 
 ::: {.callout-warning title="Open question"}
 Which existing sentences can carry framework concepts (for example for targets or waypoints), and are new sentences needed?
@@ -38,11 +56,20 @@ Which existing sentences can carry framework concepts (for example for targets o
 
 ## Fidelity
 
+A sentence carries a value, but not the IRI of the Thing it belongs to, its references, its version, a signature, usage terms, or provenance beyond its talker and port.
+A Thing held from sentences alone is therefore incomplete ([NCF-SEM-012](../overview/semantic-model.qmd#ncf-sem-012)).
+Sentences also fix the units and resolution of what they carry, as NMEA 0183 defines them.
+
 ::: {.callout-warning title="Open question"}
 Does IEC 61162-450 differ from NMEA 0183 serial links in what it can carry?
 :::
 
 ## Trust
+
+Sentences on the vessel's network are not authenticated: trust in them comes from physical access to the vessel's own network.
+The vessel's gateway is the origin of the Things it makes from sentences (@sec-origins), and signs them as the vessel (@sec-trust-security).
+The sentences themselves are not Things: each one's talker, port and sentence identifier are recorded in the provenance of what the gateway makes from it (@sec-provenance).
+See [provisional decision 0030](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0030-on-board-bindings.md).
 
 ::: {.callout-warning title="Open question"}
 Does IEC 61162-450 differ from NMEA 0183 serial links in how authenticity can be conveyed?

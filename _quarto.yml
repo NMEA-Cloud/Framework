@@ -33,6 +33,7 @@ book:
       chapters:
         - vocab/core.qmd
         - vocab/observations.qmd
+        - vocab/notices.qmd
         - vocab/vessel-data.qmd
     - part: bindings/index.qmd
       chapters:
@@ -46,6 +47,7 @@ book:
         - applications/recording.qmd
   appendices:
     - appendices/glossary.qmd
+    - appendices/examples.qmd
     - appendices/references.qmd
 
 bibliography: references.bib

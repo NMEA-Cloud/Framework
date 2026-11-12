@@ -1,0 +1,398 @@
+# JSON-LD examples {#sec-examples}
+
+[Informative]{.status}
+
+These examples show Things described in Parts I and II as JSON-LD (@sec-binding-json-ld), following the whale sightings application (@sec-app-whales).
+
+Namespaces are not yet decided ([decision 0006](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0006-namespaces.md)),
+so the framework's own terms are written under `https://example.org/vocab/`, and the examples share a context published at `https://example.org/context.jsonld`.
+Terms reused from other vocabularies, such as Darwin Core [@darwin-core] and the DCMI metadata terms, keep their published IRIs.
+The terms and values are illustrative: the candidate terms of each vocabulary module have not been agreed.
+The examples leave out the IRIs of their versions and of the versions they succeed ([NCF-SEM-040](../overview/semantic-model.qmd#ncf-sem-040), [NCF-SEM-041](../overview/semantic-model.qmd#ncf-sem-041)), since the terms that state them are still open (@sec-versions).
+
+## The context {#sec-example-context}
+
+```json
+{
+  "@context": {
+    "@vocab": "https://example.org/vocab/",
+    "dwc": "http://rs.tdwg.org/dwc/terms/",
+    "dwciri": "http://rs.tdwg.org/dwc/iri/",
+    "dcterms": "http://purl.org/dc/terms/",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "label": "rdfs:label",
+    "issuer": {
+      "@id": "prov:wasAttributedTo",
+      "@type": "@id"
+    },
+    "refersTo": {
+      "@type": "@id"
+    },
+    "subject": {
+      "@type": "@vocab"
+    },
+    "action": {
+      "@type": "@vocab"
+    },
+    "area": {
+      "@type": "@json"
+    },
+    "validity": {
+      "@type": "@json"
+    },
+    "lastKnownPlace": {
+      "@type": "@json"
+    },
+    "derivedFrom": {
+      "@id": "prov:wasDerivedFrom",
+      "@type": "@id"
+    },
+    "license": {
+      "@id": "dcterms:license",
+      "@type": "@id"
+    },
+    "monitor": {
+      "@id": "http://www.iana.org/assignments/relation/monitor",
+      "@type": "@id"
+    },
+    "carriedOverAis": {
+      "@type": "@json"
+    },
+    "dwc:eventDate": {
+      "@type": "xsd:dateTime"
+    },
+    "dwc:decimalLatitude": {
+      "@type": "xsd:decimal"
+    },
+    "dwc:decimalLongitude": {
+      "@type": "xsd:decimal"
+    },
+    "dwc:coordinateUncertaintyInMeters": {
+      "@type": "xsd:decimal"
+    },
+    "dwc:individualCount": {
+      "@type": "xsd:integer"
+    },
+    "relativeTo": {
+      "@type": "@id"
+    },
+    "rules": {
+      "@type": "@id"
+    },
+    "status": {
+      "@type": "@vocab"
+    },
+    "distanceInMeters": {
+      "@type": "xsd:decimal"
+    },
+    "responsibleAuthority": {
+      "@type": "@id"
+    },
+    "dwciri:recordedBy": {
+      "@type": "@id"
+    },
+    "event": {
+      "@type": "@id"
+    },
+    "organism": {
+      "@type": "@id"
+    }
+  }
+}
+```
+
+`area`, `validity` and `lastKnownPlace` are JSON literals holding JSON-FG geometry and time objects [@ogc-json-fg], so that a place keeps JSON-FG's own form, including circular arcs.
+`carriedOverAis` is a JSON literal too, so that the examples have no blank nodes and can be signed cheaply (@sec-trust-security).
+`monitor` is named by the IANA relation IRI ([NCF-BND-JSONLD-002](../bindings/json-ld.qmd#ncf-bnd-jsonld-002)),
+`license` is `dcterms:license`, one way of stating terms of use ([NCF-SEM-020](../overview/semantic-model.qmd#ncf-sem-020)),
+and `issuer` is `prov:wasAttributedTo`, the candidate term for a notice's issuer (@sec-vocab-notices).
+Darwin Core terms in the `dwc:` namespace hold text, as Darwin Core intends, and those in the `dwciri:` namespace hold IRIs (@sec-sightings-organisms).
+
+## An organism {#sec-example-organism}
+
+Kitkat, a North Atlantic right whale, as a Thing in her own right (@sec-sightings-organisms).
+Her species is identified by its identifier in the World Register of Marine Species [@worms].
+Her last known place was updated from a sighting, and she names the version of the sighting it was derived from (@sec-provenance).
+
+```json
+{
+  "@context": "https://example.org/context.jsonld",
+  "@id": "https://example.org/organisms/kitkat",
+  "@type": "dwc:Organism",
+  "dwc:organismName": "Kitkat",
+  "dwc:scientificName": "Eubalaena glacialis",
+  "dwc:scientificNameID": "urn:lsid:marinespecies.org:taxname:159023",
+  "lastKnownPlace": {
+    "type": "Point",
+    "coordinates": [
+      -69.95,
+      41.8
+    ]
+  },
+  "derivedFrom": "https://example.org/sightings/1/versions/1"
+}
+```
+
+## A sighting {#sec-example-sighting}
+
+A sighting of Kitkat with a calf: one event containing two occurrences (@sec-vocab-observations).
+
+```json
+{
+  "@context": "https://example.org/context.jsonld",
+  "@graph": [
+    {
+      "@id": "https://example.org/sightings/1",
+      "@type": "dwc:Event",
+      "dwc:eventDate": "2026-10-25T11:40:00Z",
+      "dwc:decimalLatitude": 41.8,
+      "dwc:decimalLongitude": -69.95,
+      "dwc:coordinateUncertaintyInMeters": 200,
+      "dwc:basisOfRecord": "HumanObservation",
+      "dwc:recordedByID": "https://example.org/people/observer-1",
+      "dwciri:recordedBy": "https://example.org/people/observer-1",
+      "license": "https://creativecommons.org/licenses/by/4.0/"
+    },
+    {
+      "@id": "https://example.org/sightings/1/a",
+      "@type": "dwc:Occurrence",
+      "dwc:eventID": "https://example.org/sightings/1",
+      "event": "https://example.org/sightings/1",
+      "organism": "https://example.org/organisms/kitkat",
+      "dwc:organismID": "https://example.org/organisms/kitkat",
+      "dwc:scientificName": "Eubalaena glacialis",
+      "dwc:individualCount": 1,
+      "dwc:sex": "female",
+      "dwc:lifeStage": "adult"
+    },
+    {
+      "@id": "https://example.org/sightings/1/b",
+      "@type": "dwc:Occurrence",
+      "dwc:eventID": "https://example.org/sightings/1",
+      "event": "https://example.org/sightings/1",
+      "dwc:scientificName": "Eubalaena glacialis",
+      "dwc:individualCount": 1,
+      "dwc:lifeStage": "calf"
+    }
+  ]
+}
+```
+
+Each occurrence refers to the event, and the first to Kitkat, twice: as text in `dwc:eventID` and `dwc:organismID`, for Darwin Core tools, and by IRI in `event` and `organism`, which make the links (@sec-relationships).
+The event names its observer the same two ways, in `dwc:recordedByID` and `dwciri:recordedBy`.
+The event's license, CC BY 4.0, also governs its occurrences, which state none of their own and are part of the event (@sec-rights).
+The calf has not been identified, so its occurrence refers to no organism.
+
+## A notice {#sec-example-notice}
+
+An exclusion zone that a wildlife management agency creates around Kitkat after the sighting (@sec-vocab-notices).
+
+```json
+{
+  "@context": "https://example.org/context.jsonld",
+  "@id": "https://example.org/notices/kitkat-zone",
+  "@type": "Notice",
+  "issuer": "https://example.org/authorities/wildlife-agency",
+  "subject": "marineMammalsInArea",
+  "action": "reduceSpeed",
+  "text": "Right whale and calf in area. Reduce speed to 10 knots.",
+  "area": {
+    "type": "CurvePolygon",
+    "geometries": [
+      {
+        "type": "CircularString",
+        "coordinates": [
+          [
+            -69.95,
+            41.808993
+          ],
+          [
+            -69.937934,
+            41.8
+          ],
+          [
+            -69.95,
+            41.791007
+          ],
+          [
+            -69.962066,
+            41.8
+          ],
+          [
+            -69.95,
+            41.808993
+          ]
+        ]
+      }
+    ]
+  },
+  "validity": {
+    "interval": [
+      "2026-10-25T12:00:00Z",
+      "2026-10-26T12:00:00Z"
+    ]
+  },
+  "refersTo": [
+    "https://example.org/organisms/kitkat"
+  ],
+  "carriedOverAis": [
+    {
+      "station": "003669999",
+      "linkage": 17
+    }
+  ],
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "monitor": "https://example.org/notices/kitkat-zone/events"
+}
+```
+
+The notice refers to Kitkat, not to the sighting.
+Its area is a circle of 1 km radius, a curve polygon of one circular string with two arcs;
+its validity is an interval.
+`carriedOverAis` lists every AIS station and linkage identifier it is carried under, its aliases ([NCF-BND-AIS-001](../bindings/ais.qmd#ncf-bnd-ais-001)).
+
+## The notice as a JSON-FG feature {#sec-example-notice-fg}
+
+The same notice for clients that read features, with its IRI as the feature's `id`.
+
+```json
+{
+  "type": "Feature",
+  "id": "https://example.org/notices/kitkat-zone",
+  "featureType": "Notice",
+  "time": {
+    "interval": [
+      "2026-10-25T12:00:00Z",
+      "2026-10-26T12:00:00Z"
+    ]
+  },
+  "place": {
+    "type": "CurvePolygon",
+    "geometries": [
+      {
+        "type": "CircularString",
+        "coordinates": [
+          [
+            -69.95,
+            41.808993
+          ],
+          [
+            -69.937934,
+            41.8
+          ],
+          [
+            -69.95,
+            41.791007
+          ],
+          [
+            -69.962066,
+            41.8
+          ],
+          [
+            -69.95,
+            41.808993
+          ]
+        ]
+      }
+    ]
+  },
+  "geometry": null,
+  "properties": {
+    "issuer": "https://example.org/authorities/wildlife-agency",
+    "subject": "marineMammalsInArea",
+    "action": "reduceSpeed",
+    "text": "Right whale and calf in area. Reduce speed to 10 knots.",
+    "refersTo": [
+      "https://example.org/organisms/kitkat"
+    ]
+  }
+}
+```
+
+Its area is the feature's `place` and its validity its `time`.
+`geometry` is `null` because the area has arcs, which GeoJSON cannot express.
+
+## A management area that moves with an organism {#sec-example-management-area}
+
+A rule an agency sets for North Atlantic right whales: vessels keep 1000 m clear.
+It is relative to the species, identified by its WoRMS identifier, so it applies around every right whale (@sec-management-areas).
+
+```json
+{
+  "@context": "https://example.org/context.jsonld",
+  "@id": "https://example.org/areas/right-whale-approach",
+  "@type": "ManagementArea",
+  "label": "Right whale approach zone",
+  "responsibleAuthority": "https://example.org/authorities/wildlife-agency",
+  "rules": "https://example.org/regulations/right-whale-approach",
+  "relativeTo": "urn:lsid:marinespecies.org:taxname:159023",
+  "distanceInMeters": 1000
+}
+```
+
+## A notice of the management area {#sec-example-management-area-notice}
+
+The notice that the zone is active around Kitkat.
+It refers to the management area and to Kitkat, and gives the area the zone covers now, from Kitkat's last known place;
+as she moves, the notice is updated.
+Its validity has no end: the agency marks it inactive, for example when Kitkat's position becomes too uncertain.
+
+```json
+{
+  "@context": "https://example.org/context.jsonld",
+  "@id": "https://example.org/notices/kitkat-approach",
+  "@type": "Notice",
+  "issuer": "https://example.org/authorities/wildlife-agency",
+  "refersTo": [
+    "https://example.org/areas/right-whale-approach",
+    "https://example.org/organisms/kitkat"
+  ],
+  "status": "active",
+  "area": {
+    "type": "CurvePolygon",
+    "geometries": [
+      {
+        "type": "CircularString",
+        "coordinates": [
+          [
+            -69.95,
+            41.808993
+          ],
+          [
+            -69.937934,
+            41.8
+          ],
+          [
+            -69.95,
+            41.791007
+          ],
+          [
+            -69.962066,
+            41.8
+          ],
+          [
+            -69.95,
+            41.808993
+          ]
+        ]
+      }
+    ]
+  },
+  "validity": {
+    "interval": [
+      "2026-10-25T12:00:00Z",
+      ".."
+    ]
+  },
+  "text": "Right whale approach zone active. Keep 1000 m clear.",
+  "license": "https://creativecommons.org/publicdomain/zero/1.0/",
+  "monitor": "https://example.org/notices/kitkat-approach/events"
+}
+```
+
+::: {.callout-warning title="To be written"}
+How a change to a notice, such as an update or a withdrawal, is represented when it is announced to those following it (@sec-binding-json-ld).
+A notice received over AIS alone, before its IRI is known (@sec-ais-identity).
+:::

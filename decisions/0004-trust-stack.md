@@ -24,3 +24,5 @@ To be completed.
 ## Consequences
 
 To be completed. Open: how trust is conveyed over transports too small to carry signatures (AIS, NMEA 2000).
+
+Provisional decision 0024 replaces JWS for persistent signatures with Data Integrity proofs over the canonical RDF dataset; JWE remains proposed for encryption.

@@ -23,6 +23,62 @@ The working proposal (see [decision record 0003](https://github.com/NMEA-Cloud/F
 - Every Thing is a **web resource**, identified by its IRI.
 - **HTTP** [@rfc9110] is the baseline protocol, using its standard methods.
 
+### Change notifications {#sec-change-notifications}
+
+A change notification tells a participant that a Thing has changed (@sec-changes), so that it can fetch the Thing if it is interested.
+A notification carries the kind of change, create, update or delete, and a link to the Thing.
+It may also carry hints, so that a receiver can decide whether to fetch the Thing without fetching it: the IRI of the new version (@sec-versions), the Thing's type, when it was modified, and its area as a bounding box.
+A receiver that already holds the version a notification names need not fetch it.
+A notification is not the Thing, and a receiver acts on the Thing it fetches.
+
+::: {.requirement #ncf-bnd-jsonld-003}
+**NCF-BND-JSONLD-003** · *Draft*\
+A change notification MUST state the kind of change and link to the Thing that changed.
+:::
+
+For a delete there is nothing to fetch.
+Since a forged notification of a delete could suppress a warning, a receiver acts on one without confirming it only when it trusts the channel that carried it, such as a TLS connection to the Thing's origin (@sec-origins).
+Otherwise it confirms the delete by retrieving the Thing.
+
+::: {.requirement #ncf-bnd-jsonld-004}
+**NCF-BND-JSONLD-004** · *Draft*\
+A receiver MUST NOT act on a notification of a delete without retrieving the Thing, unless it trusts the channel that carried the notification.
+:::
+
+The link is a locator: it need only lead to the Thing, and may be made for the receiver, for example from the address through which the receiver connected.
+The receiver identifies the Thing by the IRI its representation gives itself ([NCF-SEM-004](../overview/semantic-model.qmd#ncf-sem-004), [NCF-SEM-043](../overview/semantic-model.qmd#ncf-sem-043)).
+
+A receiver that may have missed notifications, for example after reconnecting, fetches again the Things it holds, with conditional requests so that a Thing that has not changed costs little.
+A transport may also offer a point from which to resume, such as the `id` of a server-sent event with `Last-Event-ID` [@whatwg-html], or an MQTT persistent session [@mqtt5]; offering one is optional.
+
+CoAP Observe is the exception: each notification is the resource's representation itself [@rfc7641], not a link to it.
+
+::: {.callout-warning title="Open question"}
+How is a change notification encoded: which properties name the kind of change, the link and each hint, and is a notification itself JSON-LD?
+:::
+
+### Requesting changes {#sec-requesting-changes}
+
+Any participant can request a change to a Thing, with `POST`, `PUT`, `PATCH` [@rfc5789] or `DELETE`.
+A request is not a change.
+Only the Thing's origin applies changes ([NCF-SEM-031](../overview/semantic-model.qmd#ncf-sem-031)): it decides, under its owner's authorization policy (@sec-identity-authorization), whether to make the change, and the owner makes it, and may sign it (@sec-trust-security).
+A change made on request is the owner's change, and the requester appears in its provenance (@sec-provenance).
+An origin can accept a request before the owner has made the change, for example when the owner must review or sign it.
+
+::: {.requirement #ncf-bnd-jsonld-005}
+**NCF-BND-JSONLD-005** · *Draft*\
+A server MUST NOT apply a request to change a Thing unless the Thing's owner authorizes the change.
+:::
+
+When a participant requests the creation of a Thing in another's collection, such as a sighting reported to an agency, who owns the Thing that results depends on the collection owner's contribution policy.
+Either ownership passes to the collection's owner, as with a work made for hire, or the contributor keeps it and licenses the Thing to the collection's owner.
+Either way, the Thing that results states its owner and its terms (@sec-rights), and the contributor appears in its provenance.
+
+::: {.callout-warning title="Open question"}
+How does a collection's owner publish its contribution policy, so that a contributor knows it before contributing?
+Where the contributor keeps ownership, which origin applies later changes to the Thing?
+:::
+
 ### HTTP
 
 See [provisional decision 0009](https://github.com/NMEA-Cloud/Framework/blob/main/decisions/0009-json-ld-over-http.md).
@@ -36,9 +92,17 @@ A client can find which versions a server supports from the `alpn` parameter of 
 
 Retrieve the resource at the Thing's IRI with `GET`.
 
-#### Publishing
+A Thing that has ended, such as a withdrawn or expired notice, is returned like any other, with `200 OK` and its status in its representation ([NCF-VOC-NOT-001](../vocab/notices.qmd#ncf-voc-not-001)).
+A deleted Thing is answered with `410 Gone` [@rfc9110].
 
-Send a Thing to a server with a mutating method such as `POST`, `PUT` or `PATCH` [@rfc5789].
+::: {.requirement #ncf-bnd-jsonld-009}
+**NCF-BND-JSONLD-009** · *Draft*\
+A server SHOULD answer a request for a Thing that has been deleted with `410 Gone`.
+:::
+
+#### Requesting changes
+
+Request a change with `POST`, `PUT`, `PATCH` [@rfc5789] or `DELETE`; the Thing's origin decides whether to make it (@sec-requesting-changes).
 
 #### Receiving changes
 
@@ -85,9 +149,9 @@ CoAP [@rfc7252] is a web transfer protocol for constrained devices and networks,
 
 Retrieve the resource with `GET`.
 
-#### Publishing
+#### Requesting changes
 
-Send a Thing with a mutating method such as `POST` or `PUT`.
+Request a change with a mutating method such as `POST`, `PUT` or `DELETE`; the Thing's origin decides whether to make it (@sec-requesting-changes).
 
 #### Receiving changes
 
@@ -141,6 +205,44 @@ RFC 5988 [@rfc5988] described this form of relation IRI, but RFC 8288, which rep
 If it is not stable, a term in a framework vocabulary is used instead.
 :::
 
+### Versions and caching
+
+A Thing's representation states the IRI of the version it carries (@sec-versions).
+The entity tag of a response [@rfc9110] is the server's own, and a server can derive it from the version's IRI; a strong entity tag differs between representations of the same version, such as JSON-LD and CBOR-LD.
+
+A receiver revalidates a cached representation with a conditional `GET` and `If-None-Match`.
+A request to change a Thing is made conditional on the version it was based on with `If-Match`, so that the origin refuses it with `412 Precondition Failed` if the Thing has changed since.
+
+::: {.requirement #ncf-bnd-jsonld-006}
+**NCF-BND-JSONLD-006** · *Draft*\
+A request to change a Thing SHOULD be conditional, with `If-Match`, on the version of the Thing it was based on.
+:::
+
+A response links the version it carries to others with `Link` headers [@rfc8288] and the version relations [@rfc5829]: `latest-version` to the current version, and `predecessor-version` to each version it succeeds.
+An earlier version that its owner keeps is served at the version's own IRI.
+
+A cache does not keep a representation beyond the Thing's next scheduled change (@sec-changes), since the Thing may be a different version from then on.
+
+::: {.requirement #ncf-bnd-jsonld-007}
+**NCF-BND-JSONLD-007** · *Draft*\
+A server SHOULD set the freshness lifetime of a representation, with `Cache-Control: max-age` or `Expires` [@rfc9111], to end no later than the time of the Thing's next scheduled change.
+:::
+
+### Contexts
+
+A Data Integrity proof is verified over the RDF a representation expresses, which depends on its JSON-LD context (@sec-trust-security).
+A context that could change at its IRI would let anyone who controls it change what a signed Thing means without breaking its signature.
+A context used by a signed Thing therefore never changes at its IRI: a changed context is published at a new IRI, and a receiver can cache a context indefinitely.
+
+::: {.requirement #ncf-bnd-jsonld-008}
+**NCF-BND-JSONLD-008** · *Draft*\
+A JSON-LD context used by a persistently signed Thing MUST NOT change at its IRI; a changed context MUST be published at a new IRI.
+:::
+
+::: {.callout-warning title="Open question"}
+How does a receiver check that a context it retrieves is the one a signer used, for example by a digest of the context?
+:::
+
 ::: {.callout-warning title="To be written"}
 JSON-LD contexts for each vocabulary module; content negotiation; compact forms for constrained links.
 :::
@@ -153,7 +255,9 @@ All Things can be carried without loss.
 
 - Transport security: TLS for HTTP, with servers identified by WebPKI certificates; DTLS for `coaps:` [@rfc7252].
 - Client identity: OpenID Connect; authorization: OAuth 2.0 (@sec-trust-security).
-- Persistent signatures: JWS over the JSON-LD representation.
+- Persistent signatures: Data Integrity proofs over the canonical RDF dataset of the Thing's version, embedded in the JSON-LD representation ([NCF-TRU-002](../overview/trust-security.qmd#ncf-tru-002)).
+- Content keys: a client requests the Thing a sealed part names by `kid` with its own authorization, and receives the key as a JWE encrypted to the client's public key ([NCF-TRU-013](../overview/trust-security.qmd#ncf-tru-013)); the response is the client's alone, so a shared cache does not store it [@rfc9111].
+  A client that gives its public key in the request uses an access token bound to it ([NCF-TRU-015](../overview/trust-security.qmd#ncf-tru-015)).
 
 OSCORE [@rfc8613] can protect CoAP messages end to end, including through proxies.
 Like TLS and DTLS, it protects a message in transit, not the Thing after it is received, so it does not replace a persistent signature.
@@ -162,6 +266,10 @@ Without it, a Thing sent to a multicast group is protected only by its persisten
 
 ::: {.callout-warning title="Open question"}
 Is OSCORE used to protect CoAP messages, and Group OSCORE for group communication once it is published?
+:::
+
+::: {.callout-warning title="Open question"}
+How does a request for a content key give the client's public key over HTTP and CoAP: in the body of a `POST`, in a header, or otherwise?
 :::
 
 ## Requirements
@@ -178,6 +286,4 @@ The JSON-LD representation of a Thing SHOULD include a `monitor` link for each m
 
 ## Examples
 
-::: {.callout-warning title="To be written"}
-A whale sighting as JSON-LD (@sec-app-whales).
-:::
+Examples of an organism, a sighting and a notice as JSON-LD are in @sec-examples.
